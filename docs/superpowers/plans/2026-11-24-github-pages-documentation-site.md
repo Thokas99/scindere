@@ -76,7 +76,7 @@ Run: `/tmp/scindere-mdbook/bin/mdbook build --dest-dir target/mdbook`
 
 Expected: build succeeds; `target/mdbook/index.html` and every chapter in `docs/SUMMARY.md` exist; generated chapter and asset links remain document-relative under the `/scindere/` project path, and `404.html` uses that base path; no public page links to a missing local chapter or a planning document.
 
-- [ ] **Commit the independently reviewable docs migration**
+- [x] **Commit the independently reviewable docs migration**
 
 Commit message: `docs: organize Scindere guides as an mdBook`
 
@@ -102,7 +102,7 @@ Run: `/tmp/scindere-mdbook/bin/mdbook build --dest-dir target/mdbook`
 
 Expected: build succeeds, the rendered home includes the logo and theme stylesheet, and the sidebar/search appear. Inspect light and dark themes at desktop and narrow mobile widths; confirm text contrast and navigation remain readable.
 
-- [ ] **Commit the branded book**
+- [x] **Commit the branded book**
 
 Commit message: `docs: apply Scindere theme to documentation site`
 
@@ -131,7 +131,7 @@ Run: `git diff --check` and parse `.github/workflows/docs.yml` as YAML. Inspect 
 
 Use the authenticated GitHub CLI to create/update `Thokas99/scindere` Pages with `build_type: workflow`. Configure environment `github-pages` with a custom deployment branch policy containing only `main`. Read the Pages configuration and branch policy back to confirm both settings. If GitHub denies the authenticated settings change, leave the workflow complete and report the exact maintainer setting needed.
 
-- [ ] **Push to main and verify the hosted site**
+- [x] **Push to main and verify the hosted site**
 
 Commit message: `ci: publish Scindere documentation with GitHub Pages`. Push the reviewed commits to `main` as a fast-forward. Follow the docs workflow until build and deployment succeed; then verify `https://thokas99.github.io/scindere/` serves the book, search, images, nested page links, and `/scindere/` asset paths.
 
