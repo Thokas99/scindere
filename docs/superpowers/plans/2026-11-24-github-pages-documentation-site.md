@@ -119,15 +119,15 @@ Commit message: `docs: apply Scindere theme to documentation site`
 - Deploy only when the event is a push or manual dispatch on `refs/heads/main`; pull requests build only.
 - Deployment uses environment `github-pages`, with the environment branch policy restricted to `main`.
 
-- [ ] **Add a separate docs workflow**
+- [x] **Add a separate docs workflow**
 
 Trigger on pull requests, pushes to `main`, and manual dispatch, scoped to book/docs/README/roadmap/contribution/workflow paths. Give the build job `contents: read`. Give Pages write and OIDC token permissions only to the deployment job. Make the deployment job depend on a successful build and guard it with `github.ref == 'refs/heads/main'` plus a non-PR event check.
 
-- [ ] **Check workflow structure locally**
+- [x] **Check workflow structure locally**
 
 Run: `git diff --check` and parse `.github/workflows/docs.yml` as YAML. Inspect that the deploy job has `needs: build`, the exact `main` guard, minimal Pages/OIDC permissions, and the GitHub Pages environment URL output.
 
-- [ ] **Enable Pages and restrict its environment**
+- [x] **Enable Pages and restrict its environment**
 
 Use the authenticated GitHub CLI to create/update `Thokas99/scindere` Pages with `build_type: workflow`. Configure environment `github-pages` with a custom deployment branch policy containing only `main`. Read the Pages configuration and branch policy back to confirm both settings. If GitHub denies the authenticated settings change, leave the workflow complete and report the exact maintainer setting needed.
 
