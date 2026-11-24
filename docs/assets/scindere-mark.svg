@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-labelledby="title desc">
+  <title id="title">Scindere branching transcript mark</title>
+  <desc id="desc">A transcript enters from the left and separates into two branching RNA paths.</desc>
+  <style>
+    .teal-path { stroke: #007f79; }
+    .violet-path { stroke: #7655a6; }
+    .teal-node { fill: #007f79; }
+    .violet-node { fill: #7655a6; }
+    .junction { fill: #26384a; }
+    @media (prefers-color-scheme: dark) {
+      .teal-path { stroke: #43b7ad; }
+      .violet-path { stroke: #b49bd7; }
+      .teal-node { fill: #43b7ad; }
+      .violet-node { fill: #b49bd7; }
+      .junction { fill: #d5e0ea; }
+    }
+  </style>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
+    <path class="teal-path" d="M14 50h34"/>
+    <path class="teal-path" d="M48 50c22 0 22-30 47-30h48"/>
+    <path class="violet-path" d="M48 50c22 0 22 30 47 30h48"/>
+  </g>
+  <circle class="junction" cx="48" cy="50" r="7"/>
+  <circle class="teal-node" cx="143" cy="20" r="5"/>
+  <circle class="violet-node" cx="143" cy="80" r="5"/>
+</svg>

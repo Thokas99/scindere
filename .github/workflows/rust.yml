@@ -1,6 +1,8 @@
 name: Scindere Rust CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 permissions:
   contents: read
@@ -9,20 +11,30 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
+  rust:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install HDF5 development libraries
-        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev
-      - run: cargo fmt --all -- --check
-      - run: cargo check --all-targets --all-features
-      - run: cargo clippy --all-targets --all-features
-      - run: cargo test --all-features
-      - run: cargo build --release
-      - name: Check Scindere CLI
+        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Check all features
+        run: cargo check --locked --all-targets --all-features
+      - name: Lint all features
+        run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - name: Test BAM-enabled build
+        run: cargo test --locked --all-features
+      - name: Check without default features
+        run: cargo check --locked --all-targets --no-default-features
+      - name: Test without default features
+        run: cargo test --locked --no-default-features
+      - name: Build release executable
+        run: cargo build --locked --release
+      - name: Check CLI
         shell: bash
         run: |
           [[ "$(target/release/scindere --version)" == "scindere 0.1.0" ]]
           target/release/scindere --help | grep -q 'write-output'
-      - run: cargo package --list
+      - name: Check package contents
+        run: cargo package --list

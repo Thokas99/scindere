@@ -1,7 +1,7 @@
 # Release process
 
-Scindere starts at development version 0.1.0. The repository workflow checks source quality, compilation, tests and package contents; it does not publish to crates.io or create GitHub releases.
+Scindere is an unpublished development project. Cargo.toml sets `publish = false`, and CI does not publish packages or create GitHub releases.
 
-Before a future release, verify the Scindere crate name directly with crates.io, review repository metadata and topics, run all commands in `CONTRIBUTING.md`, inspect `cargo package --list`, and update `CHANGELOG.md` and `CITATION.cff`. Create a release tag and publish only as a separate, explicit maintainer action. Do not add automatic Cargo publishing to CI without a later release-policy decision.
+Before any future release, explicitly decide whether registry publication is wanted, verify name availability, review repository metadata, run all checks in [CONTRIBUTING.md](../../CONTRIBUTING.md), inspect `cargo package --list`, update CHANGELOG.md and CITATION.cff, and review the output/checkpoint compatibility notes. Create a version tag and publish only after that separate release decision.
 
-The old `velocyto-rs-lite` registry versions and repository are separate historical assets. Do not delete or archive the original GitHub repository as part of a Scindere release; retain its original license and attribution.
+The earlier velocyto-rs-lite package and repository have separate historical status. Preserve their attribution, BSD 2-Clause terms and local archival backup when maintaining Scindere.

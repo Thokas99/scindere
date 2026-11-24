@@ -1,142 +1,106 @@
-# Scindere
+<p align="center">
+  <img src="docs/assets/scindere-mark.svg" width="96" alt="Scindere branching transcript mark">
+</p>
+<h1 align="center">Scindere</h1>
+<p align="center"><strong>Resource-aware RNA splicing quantification for single-cell transcriptomics.</strong></p>
+<p align="center">
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.89%2B-orange?logo=rust&logoColor=white" alt="Rust 1.89 or newer"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Thokas99/scindere" alt="BSD 2-Clause license"></a>
+  <a href="https://github.com/Thokas99/scindere/actions/workflows/rust.yml"><img src="https://github.com/Thokas99/scindere/actions/workflows/rust.yml/badge.svg?branch=main" alt="Scindere Rust CI"></a>
+  <img src="https://img.shields.io/badge/version-0.1.0-42566c" alt="Development version 0.1.0">
+  <img src="https://img.shields.io/badge/status-in%20development-7655a6" alt="In development">
+</p>
 
-### Resource-aware RNA splicing quantification for large-scale single-cell transcriptomics.
+Scindere is a Rust engine for producing spliced, unspliced and ambiguous molecule
+count matrices from single-cell and single-nucleus sequencing alignments. It focuses
+on bounded counting batches, recoverable count storage and streamed H5AD or Loom
+output.
 
-Scindere is a Rust-based RNA molecule quantification engine designed to generate spliced, unspliced and ambiguous count matrices from single-cell and single-nucleus sequencing alignments. It focuses on scalable execution, memory-efficient count storage, fault tolerance and interoperability with modern single-cell analysis ecosystems.
+Scindere inherits velocyto's molecule-classification methodology. Its current
+counting path uses bounded dense scratch arrays within each batch; sparse
+checkpoints and sparse output storage do not mean that the whole computation is
+sparse.
 
-The name comes from the Latin *scindere*, “to split” or “divide,” reflecting the classification of RNA molecules by splicing state.
+<p align="center">
+  <img src="docs/assets/quantification-workflow.svg" alt="BAM, GTF and barcode inputs pass through alignment processing and molecule classification into bounded barcode batches, sparse checkpoints, and H5AD or Loom matrices with spliced, unspliced and ambiguous counts." width="100%">
+</p>
 
-## Why Scindere
+## Key features
 
-Keeping a dense gene-by-cell matrix for each count layer in memory becomes expensive as datasets grow. Concatenating dense batches can also require old and new matrices to coexist, multiplying peak memory. A workflow that retains every dense matrix until export can therefore become limited by RAM even when most gene-cell entries are zero.
+| Feature | Current capability |
+|---|---|
+| Resource-aware execution | Configurable counting buffers and bounded barcode batches |
+| Sparse count storage | Sparse checkpoints and streamed output |
+| Fault tolerance | Resumable molecule quantification |
+| Platform compatibility | 10x Genomics and BD Rhapsody workflows |
+| Native interoperability | H5AD and Loom output |
+| Execution diagnostics | Structured progress and resource telemetry |
 
-Scindere’s command-line counting path processes bounded barcode batches, writes completed counts to sparse checkpoints, and streams those checkpoints into H5AD or Loom output. Count matrices are stored sparsely between batches and in H5AD output. Counting still uses bounded dense scratch arrays within a batch; Scindere does not perform entirely sparse computation. The public library `count()` helper also retains its collecting behavior for callers that need dense arrays.
+Barcode counting is sequential in this version. Global memory accounting, adaptive
+batching and parallel barcode counting are planned in the [roadmap](ROADMAP.md).
 
-The `--count-memory-mb` option limits estimated read, molecule-evidence and scratch components. It is not a cap on total process memory: the annotation, sorting, runtime and output buffers add to process RSS. See the [architecture notes](docs/architecture/overview.md) for details.
+## Installation
 
-## Five defining contributions
-
-The status labels describe the current implementation at the initial Scindere baseline. More detail and validation criteria are in the [roadmap](ROADMAP.md).
-
-### I. Resource-aware execution — Partial
-
-- Bounded barcode batches and a configurable count-buffer budget.
-- Sorting adjusts its thread and memory settings using host, cgroup and Slurm limits.
-- Progress events report phase, batch, sort and process-memory telemetry.
-- Global memory accounting and automatic barcode-batch tuning remain planned.
-
-### II. Memory-efficient molecule quantification — Partial
-
-- The CLI commits sparse count batches and streams H5AD and Loom output.
-- Dense scratch matrices remain bounded to a counting batch.
-- Molecule evidence still uses allocation-heavy Rust collections; a compact representation is planned.
-
-### III. Scalable parallel execution — Planned
-
-- Barcode counting is currently sequential. Rayon is used in sorting and other inherited numerical routines, but not to process barcode count batches in parallel.
-- Memory-aware count workers, controlled thread use, backpressure and deterministic parallel reduction remain planned.
-
-### IV. Fault-tolerant quantification — Partial
-
-- Counting resumes from durable sparse checkpoints, validates checkpoint shards and input/settings identity, and retains committed batches after errors.
-- The sorter can reuse or publish a completed staged sort after interruption. An interrupted spill or merge stage may need to run again.
-- Complete preprocessing recovery and stronger input-content identity checks remain planned.
-
-### V. Transparent scientific diagnostics — Partial
-
-- Outputs preserve separate spliced, unspliced and ambiguous layers; H5AD and Loom writers have regression coverage.
-- Telemetry reports progress, phase timing, sort throughput and Linux process RSS/high-water RSS when available.
-- Per-molecule rejection summaries and standardized software-version provenance in output files are not implemented yet.
-
-## Install
-
-Scindere is in initial development and is not being published to crates.io as part of this rebrand. Install Rust 1.89 or newer. On Debian or Ubuntu, the build environment also needs `libhdf5-dev` and `pkg-config`.
+Scindere requires Rust 1.89 or newer and system HDF5 development files. Install
+instructions, including Debian and Ubuntu packages, are in the [installation
+guide](docs/installation.md).
 
 ```sh
-git clone https://github.com/Thokas99/scindere.git
-cd scindere
-cargo install --locked --path .
+cargo install --locked --git https://github.com/Thokas99/scindere --branch main
 scindere --version
 ```
 
-To build without installing:
+## Quick start
+
+Quantify a BAM with cell barcodes in `CB` and UMIs in `UB`:
 
 ```sh
-cargo build --locked --release
-./target/release/scindere --help
+scindere run sample.bam genes.gtf --bcfile barcodes.tsv --cb-tag CB --ub-tag UB \
+  --sampleid sample --outputfolder results
 ```
 
-The Apptainer definition is in [`apptainer/scindere.def`](apptainer/scindere.def).
+The command writes a `sample.h5ad` file by default and retains a resumable
+`sample.counts` checkpoint. See the [usage guide](docs/usage.md) for 10x, BD
+Rhapsody, DropEst and Smart-seq2 commands.
 
-## Run
+## Input and output formats
 
-Use the GTF annotation for the genome reference used to align each BAM.
-For compatibility with existing workflows, `run10x` keeps the default output directory name `velocyto`; pass `--outputfolder` to choose another location.
+| Data | Format and use |
+|---|---|
+| Alignments | BAM input with cell-barcode and, when applicable, UMI tags |
+| Annotation | GTF from the same genome reference used for alignment |
+| Barcodes | Optional whitelist for generic BAM workflows; 10x reads the filtered list from the sample folder |
+| H5AD | Default output; cell-by-gene sparse matrices with separate count layers |
+| Loom | Optional gene-by-cell output; choose with `--output-format loom` or `both` |
 
-### 10x Genomics Cell Ranger
+Output details, checkpoint compatibility and count-layer semantics are in the
+[output guide](docs/output.md).
 
-```sh
-scindere run outs/possorted_genome_bam.bam genes.gtf \
-  --bcfile outs/filtered_feature_bc_matrix/barcodes.tsv.gz \
-  --cb-tag CB --ub-tag UB \
-  --sampleid sample_10x --outputfolder results/10x
-```
+## Documentation
 
-### BD Rhapsody WTA
+- [Installation](docs/installation.md) · [Usage](docs/usage.md) ·
+  [Configuration](docs/configuration.md)
+- [Output and checkpoints](docs/output.md) ·
+  [Troubleshooting](docs/troubleshooting.md) ·
+  [Architecture](docs/architecture/overview.md)
+- [Benchmarks](docs/benchmarks/README.md) · [Development roadmap](ROADMAP.md) ·
+  [Contributing](CONTRIBUTING.md)
+- [Provenance and project history](docs/provenance.md) · [Citation](CITATION.cff)
 
-Use the matching `*_Bioproduct.bam` and `*_RSEC_MolsPerCell_MEX.zip`. The filtered MEX archive supplies the called barcodes; use the GTF from the same BD reference archive used for alignment.
+## Citation and acknowledgements
 
-```sh
-unzip -p sample_RSEC_MolsPerCell_MEX.zip barcodes.tsv.gz > sample_called_barcodes.tsv.gz
+Scindere builds on the velocyto methodology, the `velocyto-rs` Rust implementation
+by Zhuoqing Fang, and Johan Henriksson's original translation contributions.
+Resource-aware batching, sparse checkpoints and streamed outputs were carried
+forward from `velocyto-rs-lite`. Scindere does not introduce a new
+molecule-classification algorithm; the full lineage and upstream license notes are
+in [provenance](docs/provenance.md).
 
-scindere run sample_Bioproduct.bam genes.gtf \
-  --bcfile sample_called_barcodes.tsv.gz \
-  --cb-tag CB --ub-tag MA \
-  --sampleid sample_bd --outputfolder results/bd
-```
-
-With UMI counting enabled, reads are grouped by the selected cell-barcode and UMI tags. The `--logic` option controls how molecule evidence is assigned to the `spliced`, `unspliced`, `ambiguous` and, for `Discordant10X`, `spanning` layers. These are molecule counts; Scindere does not estimate RNA-velocity vectors or fit downstream velocity models.
-
-H5AD is the default output and preserves `uint32` counts. Use `--output-format loom` or `--output-format both` to select other outputs. Loom’s optional `--dtype uint16` saturates values above 65,535; sparse checkpoints retain exact `uint32` counts.
-
-Useful resource and reporting options:
-
-- `--cell-batch-size N`: maximum raw barcodes per batch; a barcode group is not split.
-- `--count-memory-mb N`: estimated budget for each counting-buffer component, not total job memory.
-- `--samtools-threads N` and `--samtools-memory N`: sorting thread and memory settings, constrained by detected host, cgroup and Slurm limits.
-- `--telemetry-jsonl PATH`: append structured progress, phase, sort and memory events.
-
-Run `scindere run --help` or `scindere --help` for all commands and options.
-
-## Resume and export
-
-Counting writes checkpoints by default under `OUTPUT/SAMPLE.counts`. Resume an interrupted run with its original inputs and counting settings:
-
-```sh
-scindere run sample.bam genes.gtf --resume-from results/sample.counts
-```
-
-Export a completed checkpoint without recounting:
-
-```sh
-scindere write-output results/sample.counts \
-  --outputfolder results --output-format h5ad
-```
-
-### Existing checkpoint compatibility
-
-The rebrand does not change the checkpoint schema or counting settings. Existing `velocyto-rs-lite` checkpoints using format version 2 remain readable and resumable by Scindere when the original input identities and settings match. The existing version 1 to version 2 migration remains in place. This claim covers the rebrand only; future schema changes must be versioned and documented.
-
-## Origins and acknowledgements
-
-Scindere originated from the [`velocyto-rs` codebase](https://github.com/zqfang/velocyto-rs) developed by Zhuoqing Fang, which is a Rust implementation of the established [`velocyto.py` project](https://github.com/velocyto-team/velocyto.py). The upstream `velocyto-rs` README also acknowledges Johan Henriksson’s original translation work.
-
-The molecule-classification logic and splicing-state methodology are inherited from these upstream projects; they were not developed for Scindere. The bounded counting batches, sparse checkpoints and streamed output present at this baseline were added during the intervening `velocyto-rs-lite` fork and are inherited by Scindere. The initial Scindere rebrand itself does not claim a new classification algorithm.
-
-We acknowledge the original velocyto authors and methodology, Zhuoqing Fang and the `velocyto-rs` implementation, and all contributors whose code is carried forward. The upstream projects and this checkout use the BSD 2-Clause license; the original license text and required notices remain in [`LICENSE`](LICENSE). See the original repositories’ [velocyto.py license](https://github.com/velocyto-team/velocyto.py/blob/master/LICENSE) and [`velocyto-rs` license](https://github.com/zqfang/velocyto-rs/blob/main/LICENSE).
-
-The method is described by La Manno et al., [“RNA velocity of single cells”](https://doi.org/10.1038/s41586-018-0414-6), *Nature* 560, 494–498 (2018). See [`CITATION.cff`](CITATION.cff) for software and paper references.
+Please cite La Manno et al., [“RNA velocity of single
+cells”](https://doi.org/10.1038/s41586-018-0414-6), *Nature* 560, 494–498 (2018),
+and the software references in [CITATION.cff](CITATION.cff).
 
 ## License
 
-Scindere is distributed under BSD 2-Clause. Retain the notices and conditions in [`LICENSE`](LICENSE) when redistributing source or binaries.
+Scindere is distributed under the BSD 2-Clause License. See [LICENSE](LICENSE) and
+retain the upstream notices when redistributing.

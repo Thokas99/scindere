@@ -23,3 +23,5 @@ Sparse storage is used for durable count batches and H5AD matrices. Dense arrays
 ## Interoperability
 
 H5AD output uses cell-by-gene sparse CSR matrices and separate count layers. Loom output uses gene-by-cell layout and bounded tile writes. Regression tests compare exact integer layer counts and read both output layouts. The stored checkpoint is independent of the Rust package name.
+
+See the [configuration guide](../configuration.md) for exposed budgets and the [output guide](../output.md) for matrix schemas and checkpoint compatibility.

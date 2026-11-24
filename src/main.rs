@@ -3,7 +3,7 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command(
     name = "scindere",
-    about = "Resource-aware RNA splicing molecule quantification",
+    about = "Resource-aware RNA splicing quantification for single-cell transcriptomics",
     version
 )]
 struct Cli {
@@ -12,6 +12,7 @@ struct Cli {
 }
 
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)] // Keep Clap's short-lived argument values inline.
 enum Commands {
     Run(scindere::commands::run::RunArgs),
     Run10x(scindere::commands::run10x::Run10xArgs),

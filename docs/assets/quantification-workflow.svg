@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 270" role="img" aria-labelledby="title desc">
+  <title id="title">Scindere quantification workflow</title>
+  <desc id="desc">BAM, GTF and barcode inputs pass through alignment processing, molecule classification, bounded barcode batches and sparse checkpoints to H5AD or Loom matrices containing spliced, unspliced and ambiguous counts.</desc>
+  <style>
+    text { font-family: Inter, ui-sans-serif, system-ui, sans-serif; fill: #26384a; }
+    .node { fill: #f7f9fb; stroke: #c8d3dc; stroke-width: 2; }
+    .title { font-size: 17px; font-weight: 650; }
+    .detail { font-size: 13px; fill: #526477; }
+    .flow { fill: none; stroke: #007f79; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .arrowhead { fill: none; stroke: #007f79; stroke-width: 2; }
+    .chip1 { fill: #e4f2f0; }
+    .chip2 { fill: #eee9f5; }
+    .chip3 { fill: #edf0f4; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .node { fill: #161b22; stroke: #40566c; }
+      .detail { fill: #b1bfcd; }
+      .flow { stroke: #47b8ae; }
+      .arrowhead { stroke: #47b8ae; }
+      .chip1 { fill: #163c3a; }
+      .chip2 { fill: #30243f; }
+      .chip3 { fill: #27313d; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path class="arrowhead" d="M0 0l10 5-10 5"/>
+    </marker>
+  </defs>
+  <g>
+    <rect class="node" x="36" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="130" y="91" text-anchor="middle">Inputs</text>
+    <text class="detail" x="130" y="124" text-anchor="middle">BAM + GTF</text>
+    <text class="detail" x="130" y="151" text-anchor="middle">Barcodes</text>
+
+    <path class="flow" d="M230 135h31" marker-end="url(#arrow)"/>
+    <rect class="node" x="272" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="366" y="108" text-anchor="middle">Alignment</text>
+    <text class="title" x="366" y="132" text-anchor="middle">processing</text>
+    <text class="detail" x="366" y="164" text-anchor="middle">grouped by barcode</text>
+
+    <path class="flow" d="M466 135h31" marker-end="url(#arrow)"/>
+    <rect class="node" x="508" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="602" y="108" text-anchor="middle">Molecule</text>
+    <text class="title" x="602" y="132" text-anchor="middle">classification</text>
+    <text class="detail" x="602" y="164" text-anchor="middle">splicing states</text>
+
+    <path class="flow" d="M702 135h31" marker-end="url(#arrow)"/>
+    <rect class="node" x="744" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="838" y="98" text-anchor="middle">Bounded barcode</text>
+    <text class="title" x="838" y="122" text-anchor="middle">batches</text>
+    <text class="detail" x="838" y="154" text-anchor="middle">dense scratch per batch</text>
+
+    <path class="flow" d="M938 135h31" marker-end="url(#arrow)"/>
+    <rect class="node" x="980" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="1074" y="108" text-anchor="middle">Sparse</text>
+    <text class="title" x="1074" y="132" text-anchor="middle">checkpoints</text>
+    <text class="detail" x="1074" y="164" text-anchor="middle">committed count batches</text>
+
+    <path class="flow" d="M1174 135h31" marker-end="url(#arrow)"/>
+    <rect class="node" x="1216" y="42" width="188" height="186" rx="14"/>
+    <text class="title" x="1310" y="84" text-anchor="middle">H5AD / Loom</text>
+    <text class="detail" x="1310" y="108" text-anchor="middle">count matrices</text>
+    <rect class="chip1" x="1232" y="126" width="156" height="24" rx="12"/>
+    <text class="detail" x="1310" y="143" text-anchor="middle">spliced</text>
+    <rect class="chip2" x="1232" y="158" width="156" height="24" rx="12"/>
+    <text class="detail" x="1310" y="175" text-anchor="middle">unspliced</text>
+    <rect class="chip3" x="1232" y="190" width="156" height="24" rx="12"/>
+    <text class="detail" x="1310" y="207" text-anchor="middle">ambiguous</text>
+  </g>
+</svg>

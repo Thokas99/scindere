@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest a focused improvement to Scindere.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What scientific or workflow need is not currently met?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the smallest change that would address the need.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: How should count correctness, output compatibility or resource behavior be checked?
+    validations:
+      required: true

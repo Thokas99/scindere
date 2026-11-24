@@ -3,17 +3,20 @@ name = "scindere"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.89"
-description = "Resource-aware RNA splicing molecule quantification for single-cell transcriptomics"
+description = "Resource-aware RNA splicing quantification for single-cell transcriptomics, written in Rust."
 license = "BSD-2-Clause"
 authors = ["Thomas Sirchi (Thokas99)"]
+publish = false
 repository = "https://github.com/Thokas99/scindere"
 homepage = "https://github.com/Thokas99/scindere"
-documentation = "https://docs.rs/scindere"
 readme = "README.md"
 default-run = "scindere"
 autobins = false
-keywords = ["bioinformatics", "single-cell", "rna-velocity", "rna-seq", "genomics"]
+keywords = ["bioinformatics", "single-cell", "rna-velocity", "rna-seq", "transcriptomics"]
 categories = ["science", "command-line-utilities"]
+
+[package.metadata.scindere]
+maintainers = ["Thokas99"]
 
 [[bin]]
 name = "scindere"
@@ -24,7 +27,7 @@ name = "scindere"
 path = "src/lib.rs"
 
 [dependencies]
-# HDF5 / loom I/O — pure Rust, no C library
+# Sparse HDF5 helpers; the hdf5-metno dependency below links system HDF5.
 hdf5-pure-rust = "0.3"
 # BAM/SAM reading — pure Rust, no C library (replaces rust-htslib/htslib)
 noodles-bam = { version = "0.90.0", optional = true }

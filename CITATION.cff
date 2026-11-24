@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use Scindere, cite the software and the original RNA velocity methodology listed below."
+message: "If you use Scindere, cite this software and the original RNA velocity methodology listed below."
 type: software
 title: Scindere
 version: 0.1.0
