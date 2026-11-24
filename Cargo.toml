@@ -1,0 +1,85 @@
+[package]
+name = "scindere"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+description = "Resource-aware RNA splicing molecule quantification for single-cell transcriptomics"
+license = "BSD-2-Clause"
+authors = ["Thomas Sirchi (Thokas99)"]
+repository = "https://github.com/Thokas99/scindere"
+homepage = "https://github.com/Thokas99/scindere"
+documentation = "https://docs.rs/scindere"
+readme = "README.md"
+default-run = "scindere"
+autobins = false
+keywords = ["bioinformatics", "single-cell", "rna-velocity", "rna-seq", "genomics"]
+categories = ["science", "command-line-utilities"]
+
+[[bin]]
+name = "scindere"
+path = "src/main.rs"
+
+[lib]
+name = "scindere"
+path = "src/lib.rs"
+
+[dependencies]
+# HDF5 / loom I/O — pure Rust, no C library
+hdf5-pure-rust = "0.3"
+# BAM/SAM reading — pure Rust, no C library (replaces rust-htslib/htslib)
+noodles-bam = { version = "0.90.0", optional = true }
+noodles-sam = { version = "0.85.0", optional = true }
+noodles-bgzf = { version = "0.47.0", optional = true }
+# N-dimensional arrays
+ndarray = { version = "0.15", features = ["rayon"] }
+# Sparse matrices
+sprs = "0.11"
+# Statistical distributions
+statrs = "0.17"
+# Optimization (slope fitting)
+argmin = "0.10"
+argmin-math = { version = "0.4", features = ["ndarray_v0_15-nolinalg"] }
+# ML — PCA, KNN
+linfa = "0.7"
+linfa-reduction = "0.7"
+linfa-nn = "0.7"
+# Parallelism (replaces Cython OpenMP + numba)
+rayon = "1"
+# CLI
+clap = { version = "4", features = ["derive"] }
+# Logging
+log = "0.4"
+env_logger = "0.11"
+# Compression (for serialization)
+flate2 = "1"
+# Errors
+thiserror = "2"
+anyhow = "1"
+# Regex (for GTF parsing in counter.rs)
+regex = "1"
+# Random number generation (for placeholder UMI)
+rand = "0.8"
+# Compile-time hash maps (for GEM_codes, CIGAR)
+phf = { version = "0.11", features = ["macros"] }
+# Temp spill files for the pure-Rust BAM tag sort (only needed with `bam`)
+tempfile = { version = "3", optional = true }
+hdf5 = { package = "hdf5-metno", version = "0.15" }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[features]
+# BAM/SAM I/O via the pure-Rust noodles crates. On by default since there is no
+# longer a C toolchain requirement (the old rust-htslib dependency is gone).
+# Build the dependency-light stub path with `cargo build --no-default-features`.
+default = ["bam"]
+bam = ["dep:noodles-bam", "dep:noodles-sam", "dep:noodles-bgzf", "dep:tempfile"]
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+lto = "thin"
+debug = true

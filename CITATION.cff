@@ -1,0 +1,88 @@
+cff-version: 1.2.0
+message: "If you use Scindere, cite the software and the original RNA velocity methodology listed below."
+type: software
+title: Scindere
+version: 0.1.0
+license: BSD-2-Clause
+repository-code: https://github.com/Thokas99/scindere
+authors:
+  - family-names: Sirchi
+    given-names: Thomas
+keywords:
+  - RNA splicing
+  - single-cell transcriptomics
+  - RNA velocity
+references:
+  - type: software
+    title: velocyto-rs
+    authors:
+      - family-names: Fang
+        given-names: Zhuoqing
+    url: https://github.com/zqfang/velocyto-rs
+    license: BSD-2-Clause
+  - type: software
+    title: velocyto.py
+    authors:
+      - family-names: Kharchenko
+        given-names: Peter
+      - family-names: Linnarsson
+        given-names: Sten
+      - family-names: La Manno
+        given-names: Gioele
+    url: https://github.com/velocyto-team/velocyto.py
+    license: BSD-2-Clause
+  - type: article
+    title: RNA velocity of single cells
+    authors:
+      - family-names: La Manno
+        given-names: Gioele
+      - family-names: Soldatov
+        given-names: Ruslan
+      - family-names: Zeisel
+        given-names: Amit
+      - family-names: Braun
+        given-names: Emelie
+      - family-names: Hochgerner
+        given-names: Hannah
+      - family-names: Petukhov
+        given-names: Viktor
+      - family-names: Lidschreiber
+        given-names: Katja
+      - family-names: Kastriti
+        given-names: Maria E.
+      - family-names: Lönnerberg
+        given-names: Peter
+      - family-names: Furlan
+        given-names: Alessandro
+      - family-names: Fan
+        given-names: Jean
+      - family-names: Borm
+        given-names: Lars E.
+      - family-names: Liu
+        given-names: Zehua
+      - family-names: van Bruggen
+        given-names: David
+      - family-names: Guo
+        given-names: Jimin
+      - family-names: He
+        given-names: Xiaoling
+      - family-names: Barker
+        given-names: Roger
+      - family-names: Sundström
+        given-names: Erik
+      - family-names: Castelo-Branco
+        given-names: Gonçalo
+      - family-names: Cramer
+        given-names: Patrick
+      - family-names: Adameyko
+        given-names: Igor
+      - family-names: Linnarsson
+        given-names: Sten
+      - family-names: Kharchenko
+        given-names: Peter V.
+    journal: Nature
+    volume: 560
+    issue: 7719
+    pages: 494-498
+    year: 2018
+    doi: 10.1038/s41586-018-0414-6

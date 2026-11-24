@@ -1,0 +1,36 @@
+Bootstrap: docker
+From: rust:1.95-bookworm
+Stage: build
+
+%files
+    Cargo.toml /opt/scindere-src/Cargo.toml
+    Cargo.lock /opt/scindere-src/Cargo.lock
+    src /opt/scindere-src/src
+
+%post
+    apt-get update
+    apt-get install -y --no-install-recommends libhdf5-dev pkg-config
+    cd /opt/scindere-src
+    cargo build --locked --release --bins
+    install -Ds target/release/scindere /opt/scindere/bin/scindere
+
+Bootstrap: docker
+From: debian:bookworm-slim
+Stage: runtime
+
+%files from build
+    /opt/scindere/bin/scindere /usr/local/bin/scindere
+
+%post
+    apt-get update
+    apt-get install -y --no-install-recommends libhdf5-103-1 libgcc-s1
+    rm -rf /var/lib/apt/lists/*
+    mkdir -p /work
+
+%runscript
+    exec /usr/local/bin/scindere "$@"
+
+%test
+    /usr/local/bin/scindere --version
+    /usr/local/bin/scindere run --help >/dev/null
+    /usr/local/bin/scindere write-output --help >/dev/null

@@ -1,0 +1,28 @@
+#![allow(unused_variables, unused_imports, unused_mut, non_snake_case)]
+
+pub mod analysis;
+#[cfg(feature = "bam")]
+pub mod bam_sort;
+pub mod commands;
+pub mod constants;
+pub mod count_checkpoint;
+pub mod count_output;
+#[cfg(all(test, feature = "bam"))]
+mod count_regression;
+pub mod counter;
+pub mod diffusion;
+pub mod estimation;
+pub mod feature;
+pub mod gene_info;
+pub mod indexes;
+pub mod logic;
+pub mod metadata;
+pub mod molitem;
+pub mod neighbors;
+pub mod read;
+pub mod segment_match;
+pub mod serialization;
+pub mod speedboosted;
+pub(crate) mod telemetry;
+pub mod transcript_model;
+pub mod utils;
