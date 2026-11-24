@@ -92,11 +92,11 @@ Commit message: `docs: organize Scindere guides as an mdBook`
 - Reuse `docs/assets/scindere-mark.svg`; do not create a second logo or add a frontend dependency.
 - Use mdBook's built-in theme controls and search. The local CSS only supplies Scindere's restrained teal/violet accents and spacing.
 
-- [ ] **Add the mark and small CSS override**
+- [x] **Add the mark and small CSS override**
 
 Show the existing mark on the documentation home with descriptive alt text. Add the CSS file and reference it with `additional-css` in `book.toml`; retain mdBook's light/dark selector and search controls.
 
-- [ ] **Rebuild and inspect both themes**
+- [x] **Rebuild and inspect both themes**
 
 Run: `/tmp/scindere-mdbook/bin/mdbook build --dest-dir target/mdbook`
 

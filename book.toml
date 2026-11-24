@@ -8,6 +8,9 @@ src = "docs"
 build-dir = "target/mdbook"
 
 [output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
 site-url = "/scindere/"
 git-repository-url = "https://github.com/Thokas99/scindere"
 edit-url-template = "https://github.com/Thokas99/scindere/edit/main/{path}"
+additional-css = ["docs/theme/scindere.css"]

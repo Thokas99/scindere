@@ -1,0 +1,24 @@
+html.light {
+    --links: #126d68;
+    --sidebar-active: #126d68;
+    --quote-border: #81709e;
+}
+
+html.rust {
+    --links: #126d68;
+    --sidebar-active: #67c9bd;
+    --quote-border: #81709e;
+}
+
+html.coal,
+html.navy,
+html.ayu {
+    --links: #72d3c7;
+    --sidebar-active: #72d3c7;
+    --quote-border: #9c8abb;
+}
+
+.content main h2 {
+    border-left: 3px solid var(--quote-border);
+    padding-left: 0.65rem;
+}
