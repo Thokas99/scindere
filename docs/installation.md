@@ -43,4 +43,4 @@ cargo test --locked --no-default-features
 
 ## Apptainer
 
-The repository includes [apptainer/scindere.def](../apptainer/scindere.def) for building a Linux image with HDF5 runtime libraries.
+The repository includes an [Apptainer definition](https://github.com/Thokas99/scindere/blob/main/apptainer/scindere.def) for building a Linux image with HDF5 runtime libraries.

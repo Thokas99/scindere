@@ -26,7 +26,7 @@ The default output folder is `<sample-folder>/velocyto` for compatibility. Use t
 
 Use the matching Bioproduct BAM, RSEC molecule MEX archive, and GTF from the aligned reference. The example script extracts the filtered barcode member and passes the BD barcode and UMI tags.
 
-[BD Rhapsody example script](../examples/bd-rhapsody/run.sh).
+[BD Rhapsody example script](https://github.com/Thokas99/scindere/blob/main/examples/bd-rhapsody/run.sh).
 
 For a multi-sample BAM, add `--sample-tag ST` if the BAM carries sample identities in `ST`.
 
@@ -34,7 +34,7 @@ For a multi-sample BAM, add `--sample-tag ST` if the BAM carries sample identiti
 
 - `run-dropest` accepts DropEst-preprocessed BAM data; `dropest-bc-correct` corrects barcodes from a two-column mapping.
 - `run-smartseq2` counts one position-sorted BAM per cell without UMIs.
-- See [the 10x example](../examples/10x/run.sh) and [Slurm example](../examples/slurm/scindere.sbatch) for runnable scripts. Submit the Slurm script with:
+- See [the 10x example](https://github.com/Thokas99/scindere/blob/main/examples/10x/run.sh) and [Slurm example](https://github.com/Thokas99/scindere/blob/main/examples/slurm/scindere.sbatch) for runnable scripts. Submit the Slurm script with:
 
 ```sh
 sbatch --export=ALL,BAM=/data/sample.bam,GTF=/ref/genes.gtf,BARCODES=/data/barcodes.tsv examples/slurm/scindere.sbatch

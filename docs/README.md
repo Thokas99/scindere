@@ -1,12 +1,19 @@
-# Documentation
+# Scindere documentation
 
-- [Installation](installation.md)
-- [Usage](usage.md)
-- [Configuration and resource controls](configuration.md)
-- [Output formats and checkpoints](output.md)
-- [Troubleshooting](troubleshooting.md)
-- [Architecture overview](architecture/overview.md)
-- [Benchmark records](benchmarks/README.md)
-- [Development roadmap](../ROADMAP.md) and [contributor guide](../CONTRIBUTING.md)
-- [Provenance and project history](provenance.md)
-- [Checkpoint format](development/checkpoints.md) and [release process](development/release.md)
+<p align="center">
+  <img src="assets/scindere-mark.svg" width="112" alt="Scindere branching transcript mark">
+</p>
+
+Scindere quantifies spliced, unspliced and ambiguous RNA molecules from
+single-cell and single-nucleus sequencing alignments. This guide covers setup,
+quantification, resource controls, output interpretation and development.
+
+## Get started
+
+- [Install Scindere](installation.md) and follow the [quick usage guide](usage.md).
+- Configure [counting resources](configuration.md), then interpret [outputs and checkpoints](output.md).
+- For implementation details, see the [architecture](architecture/overview.md)
+  and [development roadmap](development/roadmap.md).
+
+The tool inherits the velocyto classification methodology and upstream code;
+see [provenance and acknowledgements](provenance.md).

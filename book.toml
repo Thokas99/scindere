@@ -1,0 +1,13 @@
+[book]
+title = "Scindere Documentation"
+authors = ["Scindere contributors"]
+language = "en"
+src = "docs"
+
+[build]
+build-dir = "target/mdbook"
+
+[output.html]
+site-url = "/scindere/"
+git-repository-url = "https://github.com/Thokas99/scindere"
+edit-url-template = "https://github.com/Thokas99/scindere/edit/main/{path}"

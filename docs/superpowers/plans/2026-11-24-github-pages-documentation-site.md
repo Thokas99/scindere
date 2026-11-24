@@ -48,33 +48,33 @@
 - The book home is `docs/README.md`; root `README.md` remains the GitHub landing page.
 - The site navigation groups start-here guides, user guides, architecture/development, and project provenance/benchmarks.
 
-- [ ] **Install the pinned local build tool**
+- [x] **Install the pinned local build tool**
 
 Run: `cargo install mdbook --locked --version 0.5.4 --root /tmp/scindere-mdbook`
 
 Expected: `/tmp/scindere-mdbook/bin/mdbook --version` reports `mdbook v0.5.4`; no Cargo project dependency or lockfile changes.
 
-- [ ] **Add the mdBook configuration and navigation**
+- [x] **Add the mdBook configuration and navigation**
 
 Create `book.toml` and `docs/SUMMARY.md`. Set the book title to `Scindere Documentation`, source to `docs`, output to `target/mdbook`, and the GitHub Pages site URL to `/scindere/`. List every public documentation chapter exactly once; exclude `docs/superpowers/specs/` and `docs/superpowers/plans/` from the public navigation.
 
-- [ ] **Move roadmap and contribution content into the book source**
+- [x] **Move roadmap and contribution content into the book source**
 
 Move the existing full content to `docs/development/roadmap.md` and `docs/development/contributing.md`. Replace root `ROADMAP.md` and `CONTRIBUTING.md` with short links to the corresponding site pages while retaining their full content in the site.
 
-- [ ] **Make the docs home and root README point to the site**
+- [x] **Make the docs home and root README point to the site**
 
 Turn `docs/README.md` into a concise entry page with links into the book. In root `README.md`, replace direct links to individual Markdown guides with one documentation-site link to `https://thokas99.github.io/scindere/`.
 
-- [ ] **Repair links for the new book paths**
+- [x] **Repair links for the new book paths**
 
 Update local links affected by the roadmap/contribution moves. For root-only metadata such as `CITATION.cff` and `LICENSE`, link to their GitHub `main` files or link to an existing site page; do not leave relative links that escape the book source.
 
-- [ ] **Build and inspect the complete book**
+- [x] **Build and inspect the complete book**
 
 Run: `/tmp/scindere-mdbook/bin/mdbook build --dest-dir target/mdbook`
 
-Expected: build succeeds; `target/mdbook/index.html` and every chapter in `docs/SUMMARY.md` exist; the home and nested pages contain the `/scindere/` site base; no public page links to a missing local chapter or a planning document.
+Expected: build succeeds; `target/mdbook/index.html` and every chapter in `docs/SUMMARY.md` exist; generated chapter and asset links remain document-relative under the `/scindere/` project path, and `404.html` uses that base path; no public page links to a missing local chapter or a planning document.
 
 - [ ] **Commit the independently reviewable docs migration**
 

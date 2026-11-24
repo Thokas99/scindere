@@ -33,6 +33,6 @@ This timeline summarizes the inherited codebase and does not assign upstream wor
 
 ## Attribution and licensing
 
-The original BSD 2-Clause license and copyright notices remain in [LICENSE](../LICENSE). The [velocyto.py license](https://github.com/velocyto-team/velocyto.py/blob/master/LICENSE) and [velocyto-rs license](https://github.com/zqfang/velocyto-rs/blob/main/LICENSE) are acknowledged; preserve all required notices when redistributing derived source or binaries.
+The original BSD 2-Clause license and copyright notices remain in the [Scindere license](https://github.com/Thokas99/scindere/blob/main/LICENSE). The [velocyto.py license](https://github.com/velocyto-team/velocyto.py/blob/master/LICENSE) and [velocyto-rs license](https://github.com/zqfang/velocyto-rs/blob/main/LICENSE) are acknowledged; preserve all required notices when redistributing derived source or binaries.
 
-Cite La Manno et al. for the scientific method and see [CITATION.cff](../CITATION.cff) for the software and paper references.
+Cite La Manno et al. for the scientific method and see [CITATION.cff](https://github.com/Thokas99/scindere/blob/main/CITATION.cff) for the software and paper references.

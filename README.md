@@ -12,9 +12,9 @@
 </p>
 
 Scindere is a Rust engine for producing spliced, unspliced and ambiguous molecule
-count matrices from single-cell and single-nucleus sequencing alignments. It focuses
-on bounded counting batches, recoverable count storage and streamed H5AD or Loom
-output.
+count matrices from single-cell and single-nucleus sequencing alignments. It
+focuses on bounded counting batches, recoverable count storage and streamed H5AD
+or Loom output.
 
 Scindere inherits velocyto's molecule-classification methodology. Its current
 counting path uses bounded dense scratch arrays within each batch; sparse
@@ -36,14 +36,14 @@ sparse.
 | Native interoperability | H5AD and Loom output |
 | Execution diagnostics | Structured progress and resource telemetry |
 
-Barcode counting is sequential in this version. Global memory accounting, adaptive
-batching and parallel barcode counting are planned in the [roadmap](ROADMAP.md).
+Barcode counting is sequential in this version. Global memory accounting,
+adaptive batching and parallel barcode counting are planned.
 
 ## Installation
 
-Scindere requires Rust 1.89 or newer and system HDF5 development files. Install
-instructions, including Debian and Ubuntu packages, are in the [installation
-guide](docs/installation.md).
+Scindere requires Rust 1.89 or newer and system HDF5 development files. See the
+[documentation site](https://thokas99.github.io/scindere/) for installation
+instructions, including system packages.
 
 ```sh
 cargo install --locked --git https://github.com/Thokas99/scindere --branch main
@@ -60,8 +60,8 @@ scindere run sample.bam genes.gtf --bcfile barcodes.tsv --cb-tag CB --ub-tag UB 
 ```
 
 The command writes a `sample.h5ad` file by default and retains a resumable
-`sample.counts` checkpoint. See the [usage guide](docs/usage.md) for 10x, BD
-Rhapsody, DropEst and Smart-seq2 commands.
+`sample.counts` checkpoint. See the [documentation site](https://thokas99.github.io/scindere/)
+for platform workflows, configuration, checkpoint recovery and output details.
 
 ## Input and output formats
 
@@ -73,19 +73,11 @@ Rhapsody, DropEst and Smart-seq2 commands.
 | H5AD | Default output; cell-by-gene sparse matrices with separate count layers |
 | Loom | Optional gene-by-cell output; choose with `--output-format loom` or `both` |
 
-Output details, checkpoint compatibility and count-layer semantics are in the
-[output guide](docs/output.md).
-
 ## Documentation
 
-- [Installation](docs/installation.md) · [Usage](docs/usage.md) ·
-  [Configuration](docs/configuration.md)
-- [Output and checkpoints](docs/output.md) ·
-  [Troubleshooting](docs/troubleshooting.md) ·
-  [Architecture](docs/architecture/overview.md)
-- [Benchmarks](docs/benchmarks/README.md) · [Development roadmap](ROADMAP.md) ·
-  [Contributing](CONTRIBUTING.md)
-- [Provenance and project history](docs/provenance.md) · [Citation](CITATION.cff)
+**[Read the Scindere documentation](https://thokas99.github.io/scindere/)** for
+installation, usage, configuration, output formats, troubleshooting,
+architecture, benchmarks and development guidance.
 
 ## Citation and acknowledgements
 
@@ -93,8 +85,9 @@ Scindere builds on the velocyto methodology, the `velocyto-rs` Rust implementati
 by Zhuoqing Fang, and Johan Henriksson's original translation contributions.
 Resource-aware batching, sparse checkpoints and streamed outputs were carried
 forward from `velocyto-rs-lite`. Scindere does not introduce a new
-molecule-classification algorithm; the full lineage and upstream license notes are
-in [provenance](docs/provenance.md).
+molecule-classification algorithm. See the documentation site's
+[provenance page](https://thokas99.github.io/scindere/provenance.html) for the
+full lineage and license notes.
 
 Please cite La Manno et al., [“RNA velocity of single
 cells”](https://doi.org/10.1038/s41586-018-0414-6), *Nature* 560, 494–498 (2018),
@@ -102,5 +95,5 @@ and the software references in [CITATION.cff](CITATION.cff).
 
 ## License
 
-Scindere is distributed under the BSD 2-Clause License. See [LICENSE](LICENSE) and
-retain the upstream notices when redistributing.
+Scindere is distributed under the BSD 2-Clause License. See [LICENSE](LICENSE)
+and retain the upstream notices when redistributing.
