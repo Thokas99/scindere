@@ -1,24 +1,290 @@
-html.light {
-    --links: #126d68;
-    --sidebar-active: #126d68;
-    --quote-border: #81709e;
+:root {
+    --content-max-width: 1120px;
+    --page-padding: 24px;
 }
 
+html.light,
 html.rust {
-    --links: #126d68;
-    --sidebar-active: #67c9bd;
-    --quote-border: #81709e;
+    --scindere-ink: #253746;
+    --scindere-muted: #526477;
+    --scindere-link: #126d68;
+    --scindere-accent: #7655a6;
+    --scindere-surface: #f5f8fa;
+    --scindere-border: #788a97;
+    --scindere-focus: #7655a6;
+    --scindere-button-text: #ffffff;
+    --links: var(--scindere-link);
+    --sidebar-active: var(--scindere-link);
+    --quote-border: var(--scindere-accent);
 }
 
 html.coal,
 html.navy,
 html.ayu {
-    --links: #72d3c7;
-    --sidebar-active: #72d3c7;
-    --quote-border: #9c8abb;
+    --scindere-ink: #e5edf3;
+    --scindere-muted: #b5c2ce;
+    --scindere-link: #79d5ca;
+    --scindere-accent: #c2a9e2;
+    --scindere-surface: #1a2430;
+    --scindere-border: #617386;
+    --scindere-focus: #dfc9ff;
+    --scindere-button-text: #142c31;
+    --links: var(--scindere-link);
+    --sidebar-active: var(--scindere-link);
+    --quote-border: var(--scindere-accent);
+}
+
+.content main {
+    color: var(--scindere-ink);
+    font-size: 1.6rem;
+    line-height: 1.65;
+}
+
+.content main p,
+.content main ul,
+.content main ol {
+    max-width: 78ch;
 }
 
 .content main h2 {
+    margin-top: 2.4rem;
     border-left: 3px solid var(--quote-border);
     padding-left: 0.65rem;
+}
+
+.content main a:focus-visible {
+    outline: 3px solid var(--scindere-focus);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+#mdbook-theme-toggle::after {
+    content: "Theme";
+    margin-left: 0.5rem;
+    font-size: 1.3rem;
+    white-space: nowrap;
+}
+
+#mdbook-theme-toggle:focus-visible {
+    outline: 3px solid var(--scindere-focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.landing-hero {
+    max-width: 850px;
+    margin: 0 auto 2.8rem;
+    padding: 1.4rem 0 0.3rem;
+    text-align: center;
+}
+
+.landing-mark {
+    display: block;
+    width: 104px;
+    height: auto;
+    margin: 0 auto 0.75rem;
+}
+
+.landing-eyebrow {
+    margin: 0 auto 0.35rem !important;
+    color: var(--scindere-muted);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.content main .landing-hero h1 {
+    margin: 0.15rem 0 0.5rem;
+    border: 0;
+    padding: 0;
+    color: var(--scindere-ink);
+    font-size: clamp(2.8rem, 7vw, 4.2rem);
+    line-height: 1.05;
+}
+
+.content main .landing-tagline {
+    max-width: 38ch;
+    margin: 0 auto 1rem;
+    color: var(--scindere-link);
+    font-size: clamp(1.7rem, 2vw, 2rem);
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.content main .landing-intro {
+    max-width: 72ch;
+    margin: 0 auto 1.25rem;
+    color: var(--scindere-muted);
+    font-size: 1.6rem;
+    line-height: 1.7;
+    text-wrap: pretty;
+}
+
+.landing-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+
+.landing-button {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.62rem 1rem;
+    border: 1px solid var(--scindere-link);
+    border-radius: 0.45rem;
+    font-weight: 650;
+    line-height: 1.35;
+    text-decoration: none;
+}
+
+.landing-button-primary {
+    background: var(--scindere-link);
+    color: var(--scindere-button-text) !important;
+}
+
+.landing-button-secondary {
+    color: var(--scindere-link) !important;
+}
+
+.landing-button:hover,
+.guide-card:hover {
+    filter: brightness(0.96);
+}
+
+.workflow-intro {
+    margin-bottom: 1.2rem;
+    color: var(--scindere-muted);
+}
+
+.content main .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.workflow-step {
+    min-width: 0;
+    min-height: 172px;
+    padding: 1.15rem 1rem 1rem;
+    border: 1px solid var(--scindere-border);
+    border-top: 3px solid var(--scindere-link);
+    border-radius: 0.55rem;
+    background: var(--scindere-surface);
+}
+
+.workflow-step:nth-child(even) {
+    border-top-color: var(--scindere-accent);
+}
+
+.workflow-number {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    color: var(--scindere-muted);
+    font-size: 1.2rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+}
+
+.content main .workflow-step h3 {
+    margin: 0 0 0.4rem;
+    color: var(--scindere-ink);
+    font-size: 1.8rem;
+}
+
+.content main .workflow-step p {
+    margin: 0;
+    color: var(--scindere-muted);
+    font-size: 1.5rem;
+    line-height: 1.5;
+}
+
+.count-layers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 1rem 0 2.2rem;
+}
+
+.count-layer {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 66px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--scindere-border);
+    border-radius: 0.45rem;
+}
+
+.layer-symbol {
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    flex: none;
+    color: var(--scindere-link);
+    font-size: 1rem;
+}
+
+.layer-unspliced { color: var(--scindere-accent); }
+.layer-ambiguous { color: var(--scindere-muted); }
+
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.guide-card {
+    display: block;
+    min-height: 84px;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--scindere-border);
+    border-radius: 0.45rem;
+    background: var(--scindere-surface);
+    text-decoration: none;
+}
+
+.guide-card strong,
+.guide-card span {
+    display: block;
+}
+
+.guide-card strong {
+    margin-bottom: 0.25rem;
+    color: var(--scindere-link);
+}
+
+.guide-card span {
+    color: var(--scindere-muted);
+    font-size: 1.4rem;
+    line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+    .content main .workflow-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    :root { --page-padding: 16px; }
+
+    .landing-hero {
+        padding-top: 0.6rem;
+    }
+
+    .content main .workflow-grid,
+    .count-layers,
+    .guide-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workflow-step { min-height: 0; }
 }

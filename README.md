@@ -21,9 +21,10 @@ counting path uses bounded dense scratch arrays within each batch; sparse
 checkpoints and sparse output storage do not mean that the whole computation is
 sparse.
 
-<p align="center">
-  <img src="docs/assets/quantification-workflow.svg" alt="BAM, GTF and barcode inputs pass through alignment processing and molecule classification into bounded barcode batches, sparse checkpoints, and H5AD or Loom matrices with spliced, unspliced and ambiguous counts." width="100%">
-</p>
+<figure align="center">
+  <img src="docs/assets/quantification-workflow.svg" alt="Five-stage Scindere molecule-counting workflow and its three output layers." width="100%">
+  <figcaption>Scindere groups alignments by barcode, applies velocyto-derived molecule classification, counts in bounded batches using dense scratch arrays, commits sparse checkpoints and streams spliced, unspliced and ambiguous counts to H5AD or Loom.</figcaption>
+</figure>
 
 ## Key features
 
