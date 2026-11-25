@@ -14,10 +14,11 @@ use crate::feature::Feature;
 use crate::gene_info::GeneInfo;
 use crate::indexes::FeatureIndex;
 use crate::logic::Logic;
-use crate::molitem::Molitem;
 use crate::read::Read;
 use crate::transcript_model::TranscriptModel;
 
+#[cfg(feature = "bam")]
+use crate::compact_evidence::{CompactMolitem, CompactSegmentMatch};
 #[cfg(feature = "bam")]
 use noodles_bam as bam;
 #[cfg(feature = "bam")]
@@ -1637,7 +1638,7 @@ impl ExInCounter {
         reads_to_count: &mut Vec<Read>,
         max_evidence_bytes: usize,
     ) -> anyhow::Result<(HashMap<String, ndarray::Array2<u32>>, Vec<String>)> {
-        let mut molitems: HashMap<String, Molitem> = HashMap::new();
+        let mut molitems: HashMap<String, CompactMolitem> = HashMap::new();
         let mut evidence_bytes = 0usize;
         reads_to_count.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let mut repeats_reads_count = 0usize;
@@ -1662,15 +1663,15 @@ impl ExInCounter {
             let mappings_record = self
                 .feature_indexes
                 .get_mut(&cs_key)
-                .map(|ii| ii.find_overlapping_ivls(r))
+                .map(|ii| ii.find_overlapping_ivls_compact(r))
                 .unwrap_or_default();
-            charge_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
+            charge_compact_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
             if !mappings_record.is_empty() {
                 let bcumi = format!("{}|{}${}", r.sample, r.bc, r.umi);
                 molitems
                     .entry(bcumi)
                     .or_default()
-                    .add_mappings_record(mappings_record);
+                    .add_mapping(mappings_record);
                 mapped_count += 1;
             } else {
                 no_overlap_count += 1;
@@ -1702,7 +1703,7 @@ impl ExInCounter {
         reads_to_count: &mut Vec<Read>,
         max_evidence_bytes: usize,
     ) -> anyhow::Result<(HashMap<String, ndarray::Array2<u32>>, Vec<String>)> {
-        let mut molitems: HashMap<String, Molitem> = HashMap::new();
+        let mut molitems: HashMap<String, CompactMolitem> = HashMap::new();
         let mut evidence_bytes = 0usize;
         reads_to_count.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let mut repeats_reads_count = 0usize;
@@ -1726,21 +1727,21 @@ impl ExInCounter {
                 }
                 self.feature_indexes
                     .get_mut(&cs_rev_key)
-                    .map(|iir| iir.find_overlapping_ivls(r))
+                    .map(|iir| iir.find_overlapping_ivls_compact(r))
                     .unwrap_or_default()
             } else {
                 self.feature_indexes
                     .get_mut(&cs_key)
-                    .map(|ii| ii.find_overlapping_ivls(r))
+                    .map(|ii| ii.find_overlapping_ivls_compact(r))
                     .unwrap_or_default()
             };
-            charge_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
+            charge_compact_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
             if !mappings_record.is_empty() {
                 let bcumi = format!("{}|{}${}", r.sample, r.bc, r.umi);
                 molitems
                     .entry(bcumi)
                     .or_default()
-                    .add_mappings_record(mappings_record);
+                    .add_mapping(mappings_record);
             }
         }
         debug!("{repeats_reads_count} reads not considered because fully enclosed in repeat masked regions");
@@ -1755,7 +1756,7 @@ impl ExInCounter {
         reads_to_count: &mut Vec<Read>,
         max_evidence_bytes: usize,
     ) -> anyhow::Result<(HashMap<String, ndarray::Array2<u32>>, Vec<String>)> {
-        let mut molitems: HashMap<String, Molitem> = HashMap::new();
+        let mut molitems: HashMap<String, CompactMolitem> = HashMap::new();
         let mut evidence_bytes = 0usize;
         reads_to_count.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let mut repeats_reads_count = 0usize;
@@ -1779,28 +1780,28 @@ impl ExInCounter {
             let mappings_record = self
                 .feature_indexes
                 .get_mut(&cs_key)
-                .map(|ii| ii.find_overlapping_ivls(r))
+                .map(|ii| ii.find_overlapping_ivls_compact(r))
                 .unwrap_or_default();
-            charge_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
+            charge_compact_mapping(&mappings_record, &mut evidence_bytes, max_evidence_bytes)?;
             if !mappings_record.is_empty() {
                 let bcumi = format!("{}|{}${}", r.sample, r.bc, r.umi);
                 molitems
                     .entry(bcumi)
                     .or_default()
-                    .add_mappings_record(mappings_record);
+                    .add_mapping(mappings_record);
             }
             let mappings_record_r = self
                 .feature_indexes
                 .get_mut(&cs_rev_key)
-                .map(|iir| iir.find_overlapping_ivls(r))
+                .map(|iir| iir.find_overlapping_ivls_compact(r))
                 .unwrap_or_default();
-            charge_mapping(&mappings_record_r, &mut evidence_bytes, max_evidence_bytes)?;
+            charge_compact_mapping(&mappings_record_r, &mut evidence_bytes, max_evidence_bytes)?;
             if !mappings_record_r.is_empty() {
                 let bcumi = format!("{}|{}${}", r.sample, r.bc, r.umi);
                 molitems
                     .entry(bcumi)
                     .or_default()
-                    .add_mappings_record(mappings_record_r);
+                    .add_mapping(mappings_record_r);
             }
         }
         debug!("{repeats_reads_count} reads in repeat masked regions");
@@ -1812,7 +1813,7 @@ impl ExInCounter {
     fn finalize_batch(
         &self,
         cell_batch: &HashSet<String>,
-        molitems: &HashMap<String, Molitem>,
+        molitems: &HashMap<String, CompactMolitem>,
     ) -> (HashMap<String, ndarray::Array2<u32>>, Vec<String>) {
         let n_genes = self.geneid2ix.len();
         let n_cells = cell_batch.len();
@@ -1836,8 +1837,9 @@ impl ExInCounter {
         for (bcumi, molitem) in molitems {
             let bc = bcumi.split('$').next().unwrap_or("");
             if let Some(&bcidx) = bc2idx.get(bc) {
+                let molitem = molitem.materialize();
                 let rcode = self.logic.count(
-                    molitem,
+                    &molitem,
                     bcidx,
                     &mut dict_layers_columns,
                     &self.geneid2ix,
@@ -2740,18 +2742,15 @@ mod tests {
 }
 
 #[cfg(feature = "bam")]
-fn charge_mapping(
-    mapping: &HashMap<usize, Vec<crate::segment_match::SegmentMatch>>,
+fn charge_compact_mapping(
+    mapping: &Vec<CompactSegmentMatch>,
     used: &mut usize,
     limit: usize,
 ) -> anyhow::Result<()> {
-    let bytes = mapping.values().fold(0usize, |n, v| {
-        n.saturating_add(
-            v.capacity()
-                .saturating_mul(std::mem::size_of::<crate::segment_match::SegmentMatch>())
-                .saturating_add(128),
-        )
-    });
+    let bytes = mapping
+        .capacity()
+        .saturating_mul(std::mem::size_of::<CompactSegmentMatch>())
+        .saturating_add(128);
     *used = used.saturating_add(bytes.saturating_mul(4));
     anyhow::ensure!(*used <= limit, "molecule evidence exceeds count budget; checkpoints retained; increase --count-memory-mb or reduce --cell-batch-size");
     Ok(())

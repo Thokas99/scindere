@@ -66,6 +66,18 @@ fn high_depth_fixture(dir: &Path) -> (String, String) {
     (bam, gtf)
 }
 
+fn high_multiplicity_fixture(dir: &Path) -> (String, String) {
+    let (bam, gtf) = fixture(dir);
+    let mut sam = String::from("@HD\tVN:1.6\tSO:coordinate\n@SQ\tSN:chr1\tLN:1000\n");
+    for read in 0..64 {
+        sam.push_str(&format!(
+            "r{read}\t0\tchr1\t120\t255\t30M\t*\t0\t0\t*\t*\tCB:Z:a\tMA:Z:one_umi\tNH:i:1\tST:Z:S1\n"
+        ));
+    }
+    write_bam(Path::new(&bam), &sam);
+    (bam, gtf)
+}
+
 fn tag_edge_fixture(dir: &Path) -> (String, String) {
     let (bam, gtf) = fixture(dir);
     let sam = concat!(
@@ -223,6 +235,34 @@ fn streaming_matches_collecting_and_resumes_without_losing_lookahead() {
             .unwrap();
         assert_eq!(observed, expected, "logic {logic}");
     }
+}
+
+#[test]
+fn high_multiplicity_umi_matches_collecting_and_streaming_counts() {
+    let dir = tempfile::tempdir().unwrap();
+    let (bam, gtf) = high_multiplicity_fixture(dir.path());
+    let mut collecting = counter(&gtf, &bam, "Default");
+    let (layers, keys) = collecting.count(&bam, false, 100).unwrap();
+    assert_eq!(keys, ["|a"]);
+
+    let mut expected = HashMap::new();
+    for (layer, arrays) in layers {
+        expected.insert((layer, keys[0].clone()), arrays[0].column(0).to_vec());
+    }
+    assert_eq!(expected.values().flatten().copied().sum::<u32>(), 1);
+
+    let mut streaming = counter(&gtf, &bam, "Default");
+    let mut observed = HashMap::new();
+    streaming
+        .count_stream(&bam, false, 1, 0, 1024 * 1024, |layers, keys, _| {
+            assert_eq!(keys, ["|a"]);
+            for (layer, array) in layers {
+                observed.insert((layer, keys[0].clone()), array.column(0).to_vec());
+            }
+            Ok(())
+        })
+        .unwrap();
+    assert_eq!(observed, expected);
 }
 
 #[test]
