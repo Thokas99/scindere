@@ -1,5 +1,8 @@
 # Benchmark records
 
-The [benchmark records directory](https://github.com/Thokas99/scindere/tree/main/docs/benchmarks/results) contains measurements preserved from the pre-Scindere codebase. They include synthetic dense-versus-checkpoint storage runs and Linux process-level resource samples. They are not production BAM benchmarks and do not establish Slurm or whole-job peak memory.
+Records state the workload, command and measurement scope. Synthetic results do not establish production BAM or whole-job resource use.
 
-The benchmark example is [`count_storage_bench`](https://github.com/Thokas99/scindere/blob/main/examples/count_storage_bench.rs). Run each mode in a fresh process. The retained reports include command, wall time, peak child-process RSS and sampling caveats. Keep raw records unchanged; new measurements should include input dimensions, machine/runtime context, exact command and measurement scope.
+- [Compact evidence: 200,000-read synthetic case](results/compact-evidence-200k.md)
+- [Earlier dense and checkpoint storage runs](https://github.com/Thokas99/scindere/tree/main/docs/benchmarks/results)
+
+The existing [`count_storage_bench`](https://github.com/Thokas99/scindere/blob/main/examples/count_storage_bench.rs) measures count-storage and export paths. [`compact_evidence_bench`](https://github.com/Thokas99/scindere/blob/main/examples/compact_evidence_bench.rs) compares molecule-evidence counting. Run each binary in a fresh process; report peak RSS separately from the internal count timer.

@@ -83,7 +83,7 @@ pub fn dropest_bc_correct(args: DropestBcCorrectArgs) -> anyhow::Result<()> {
     correct_bam_barcodes(bam_path, &mapping, args.corrected_output.as_deref())
 }
 
-/// Public re-export of [`load_mapping_tsv`] for use in integration tests.
+/// Public re-export of `load_mapping_tsv` for use in integration tests.
 pub fn load_mapping_tsv_pub(path: &str) -> anyhow::Result<HashMap<String, String>> {
     load_mapping_tsv(path)
 }

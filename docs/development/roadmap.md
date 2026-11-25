@@ -1,48 +1,35 @@
-# Scindere roadmap
+# Development roadmap
 
-Status is assessed at the initial Scindere 0.1.0 development baseline. “Partial” means useful pieces exist, with stated limits; it does not imply the full contribution is complete. Priorities are ordered by implementation sequence.
+This page tracks implemented work, remaining work and the evidence required to close each item. “Partial” means useful parts are shipped while listed limits remain.
 
 ## 1. Global memory accounting and resource-aware execution — Partial
 
-- **Current limitation:** `--count-memory-mb` bounds estimated read, evidence and scratch components independently; it is not a whole-process limit and is not automatically reduced to fit available memory. Count batches flush on a fixed barcode ceiling or estimated byte threshold, but an oversized barcode group can fail. Sorting already consults host, cgroup and Slurm memory and thread limits.
-- **Proposed solution:** Account for annotation, sorting, read, evidence, scratch and output memory under one job budget; use scheduler/cgroup limits consistently and tune batch size before work is committed.
-- **Implementation status:** Component budgets, fixed batch limits, sort resource heuristics and RSS/progress telemetry are implemented. Shared accounting and adaptive counting batches are planned.
-- **Validation requirements:** Exercise representative inputs under constrained cgroup and Slurm allocations; compare observed RSS with estimates; force budget exhaustion and verify committed checkpoints remain resumable; compare all count layers across batch settings.
-- **Expected computational benefit:** Fewer avoidable out-of-memory failures and more predictable resource use on workstations and HPC jobs.
-- **Potential impact on scientific correctness:** Resource changes must not split a barcode group, drop reads or silently skip an over-budget batch. Counts and cell/gene identities must remain identical across budgets.
+- **Implemented:** Fixed barcode batches, a counting-component estimate, separate sort resource heuristics, and RSS/progress telemetry.
+- **Remaining:** One job budget for annotation, sorting, reads, molecule evidence, dense scratch and output; adaptive batch sizing.
+- **Validation:** Compare estimates with RSS under cgroup and Slurm limits. Force budget failures, resume committed checkpoints, and compare exact counts across batch settings.
 
-## 2. Compact molecule-evidence storage — Partial
+## 2. Compact molecule evidence — Partial
 
-- **Current limitation:** Sparse checkpoints reduce retained count-matrix memory, but molecule evidence uses allocation-heavy maps and vectors. The GTF annotation remains resident, and each count batch still allocates dense scratch arrays.
-- **Proposed solution:** Replace repeated per-molecule allocations with compact, reusable evidence buffers and explicit bounded scratch storage, while keeping sparse count shards as the durable representation.
-- **Implementation status:** Sparse checkpoint shards, bounded barcode batches and streamed H5AD/Loom writers are implemented. Compact evidence storage and broader out-of-core annotation work are planned.
-- **Validation requirements:** Compare molecule assignments and exact integer layers against the current implementation for every counting rule; measure allocation count, peak RSS and wall time on fixed synthetic and representative BAM fixtures; test high-multiplicity UMIs and large barcode groups.
-- **Expected computational benefit:** Lower evidence-buffer memory and allocation overhead, especially for high-depth cells and large batches.
-- **Potential impact on scientific correctness:** Evidence must preserve read-to-molecule grouping, UMI identity, strand handling and all classification rules. No approximation or evidence coalescing may alter counts.
+- **Implemented:** All three counter paths store per-molecule evidence in flat vectors and intersect sorted transcript indices. Count regressions cover eight logic modes, high-multiplicity UMIs and interleaved-sample resume. Public mapping and `Logic::count` APIs and checkpoint format v2 remain unchanged.
+- **Evidence:** A 200,000-read synthetic case was 9 ms faster with no measurable RSS change; see the [benchmark record](../benchmarks/results/compact-evidence-200k.md).
+- **Remaining:** Measure on representative BAMs and under constrained cgroups; test large barcode groups and exact resumed output.
 
 ## 3. Memory-aware parallel barcode counting — Planned
 
-- **Current limitation:** Barcode count batches run sequentially. Rayon is used in sorting and inherited numerical routines, but not to count multiple barcode batches concurrently. There is no count-worker scheduler, backpressure or deterministic parallel reduction.
-- **Proposed solution:** Add a bounded worker pool that schedules complete barcode groups against the shared memory budget, limits thread use, applies backpressure and commits results in deterministic order.
-- **Implementation status:** Planned; no parallel barcode counting is claimed in this release.
-- **Validation requirements:** Repeatedly compare serial and parallel counts byte-for-byte across logic modes, input order, worker counts and interruption points; stress memory limits and verify bounded in-flight work.
-- **Expected computational benefit:** Better CPU utilization and lower wall time on multi-core hosts when memory allows concurrent batches.
-- **Potential impact on scientific correctness:** Parallel reduction and commit ordering must not change layer values, barcode order, checkpoint offsets or resume behavior. Determinism is a release gate.
+- **Current state:** Barcode counting is sequential. Sorting and inherited numerical routines may use Rayon; the count loop has no worker scheduler or backpressure.
+- **Next:** Schedule complete barcode groups against a shared memory budget and commit results in deterministic order.
+- **Validation:** Compare exact counts, order, offsets and resume behavior across logic modes, worker counts and interruptions; verify bounded in-flight memory.
 
 ## 4. Complete preprocessing and counting recovery — Partial
 
-- **Current limitation:** Counting checkpoints preserve committed sparse batches, validate shard structure and resume only when input path, size, modification time and settings match. These input checks are not content hashes. The sorter can reuse a verified sorted BAM or publish a completed staged sort after interruption, but a crash during spill or merge can require sorting again.
-- **Proposed solution:** Persist recoverable preprocessing boundaries and validate them before reuse; strengthen input identity checks with content digests or another documented integrity scheme; make recovery behavior explicit for every stage.
-- **Implementation status:** Counting resume, writer locking, v1-to-v2 checkpoint migration, shard validation and completed-sort recovery are implemented. Mid-sort resume and content-based input validation are planned.
-- **Validation requirements:** Inject interruption after each preprocessing and counting boundary; corrupt manifests, shards and staged outputs; resume and compare exact count matrices with uninterrupted runs; verify changed inputs are rejected and existing checkpoints are not deleted on error.
-- **Expected computational benefit:** Avoid repeating expensive sorting and counting work after node eviction, preemption or process failure.
-- **Potential impact on scientific correctness:** Recovery must neither duplicate nor omit a source or batch. Reuse of stale or corrupted intermediates must fail closed; any stronger input identity must not silently accept changed biological data.
+- **Implemented:** Counting resume, writer locks, shard validation, v1-to-v2 checkpoint migration, and reuse of completed staged sorts.
+- **Remaining:** Resume interrupted spill/merge stages and strengthen input identity beyond path, length and modification time.
+- **Validation:** Interrupt each boundary, corrupt manifests and shards, change inputs, and compare resumed output with an uninterrupted run. Fail closed on stale or corrupt data.
 
 ## 5. Scientific diagnostics and reporting — Partial
 
-- **Current limitation:** Count layers are explicit, checkpoints store layer totals, and telemetry reports phases, progress, sort throughput and available Linux RSS/high-water RSS. Per-molecule rejection reasons, a reconciled classification summary and standardized software-version provenance in output files are not yet provided.
-- **Proposed solution:** Report molecule-classification and rejection totals with documented denominators, resource summaries, stable execution provenance and validated AnnData/Loom metadata.
-- **Implementation status:** Separate output layers, checkpoint totals, input/settings metadata and JSONL execution telemetry are implemented. Detailed scientific diagnostics and output provenance fields are planned.
-- **Validation requirements:** Reconcile diagnostic totals with checkpoint and output matrix sums; test known synthetic molecules for every accepted and rejected class; read outputs with AnnData and Loom-compatible readers; verify repeated runs record comparable provenance without changing matrix contents.
-- **Expected computational benefit:** Faster quality review and easier diagnosis of data, resource and pipeline problems; no direct count-speed claim.
-- **Potential impact on scientific correctness:** Diagnostics must use precise definitions and denominators. They must not change classification or imply that rejected molecules belong to a particular layer without evidence.
+- **Implemented:** Separate count layers, checkpoint totals and JSONL phase/resource telemetry.
+- **Remaining:** Per-molecule rejection reasons, reconciled classification summaries and standardized software-version provenance in outputs.
+- **Validation:** Reconcile diagnostics with checkpoint and matrix totals; verify known accepted and rejected molecules and H5AD/Loom metadata.
+
+See [contributing](contributing.md) for validation commands, [checkpoints](checkpoints.md) for compatibility rules and the [Rust API](../api.md) for library documentation.

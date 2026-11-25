@@ -22,6 +22,11 @@ maintainers = ["Thokas99"]
 name = "scindere"
 path = "src/main.rs"
 
+[[example]]
+name = "compact_evidence_bench"
+path = "examples/compact_evidence_bench.rs"
+required-features = ["bam"]
+
 [lib]
 name = "scindere"
 path = "src/lib.rs"

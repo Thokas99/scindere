@@ -15,8 +15,8 @@ fn default_threads(threads: Option<usize>) -> usize {
     }
 }
 
-/// Computes column-delta Pearson correlations. For each cell i, correlates d[:,i]
-/// with (e - e[:,i]) across genes. Args: emat (ngenes×ncells), dmat (ngenes×ncells).
+/// Computes column-delta Pearson correlations. For each cell i, correlates `d[:,i]`
+/// with `(e - e[:,i])` across genes. Args: `emat` (ngenes×ncells), `dmat` (ngenes×ncells).
 /// Uses parallel threads.
 pub fn col_delta_cor(
     emat: ArrayView2<f64>,
@@ -45,8 +45,8 @@ pub fn col_delta_cor_partial(
 }
 
 /// Computes column-delta Pearson correlations with log10 transform. For each cell i,
-/// correlates log10(d[:,i]+psc) with log10(e - e[:,i]+psc) across genes.
-/// Args: emat (ngenes×ncells), dmat (ngenes×ncells). Uses parallel threads.
+/// correlates `log10(d[:,i]+psc)` with `log10(e - e[:,i]+psc)` across genes.
+/// Args: `emat` (ngenes×ncells), `dmat` (ngenes×ncells). Uses parallel threads.
 pub fn col_delta_cor_log10(
     emat: ArrayView2<f64>,
     dmat: ArrayView2<f64>,
@@ -76,8 +76,8 @@ pub fn col_delta_cor_log10_partial(
 }
 
 /// Computes column-delta Pearson correlations with sqrt transform. For each cell i,
-/// correlates sqrt(d[:,i]+psc) with sqrt(e - e[:,i]+psc) across genes.
-/// Args: emat (ngenes×ncells), dmat (ngenes×ncells). Uses parallel threads.
+/// correlates `sqrt(d[:,i]+psc)` with `sqrt(e - e[:,i]+psc)` across genes.
+/// Args: `emat` (ngenes×ncells), `dmat` (ngenes×ncells). Uses parallel threads.
 pub fn col_delta_cor_sqrt(
     emat: ArrayView2<f64>,
     dmat: ArrayView2<f64>,
@@ -206,7 +206,7 @@ pub fn fit1_slope_weighted(
 /// Fit linear regression with intercept: y = m*x + q.
 ///
 /// When `fixperc_q` is true: q = median(y where x <= percentile(x,1)),
-/// then m = sum((y-q)*x) / sum(x*x) clamped to [0,20].
+/// then `m = sum((y-q)*x) / sum(x*x)` clamped to `[0, 20]`.
 /// Otherwise: closed-form OLS with intercept.
 pub fn fit1_slope_offset(y: ArrayView1<f64>, x: ArrayView1<f64>, fixperc_q: bool) -> (f64, f64) {
     let any_x = x.iter().any(|&v| v != 0.0);

@@ -22,8 +22,11 @@ cargo test --locked --all-features
 cargo check --locked --all-targets --no-default-features
 cargo test --locked --no-default-features
 cargo build --locked --release
+cargo doc --locked --no-deps --all-features
 cargo package --list
 ```
+
+The documentation site publishes the generated [Rust API reference](../api.md) alongside the development guides.
 
 The library keeps a scoped Clippy allowlist for inherited translation-era lints. Keep it limited to the documented modules and remove allowances when those areas receive behavior-focused cleanup.
 

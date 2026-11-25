@@ -67,10 +67,12 @@ impl Diffusion {
     /// Compute a right-stochastic transition matrix from a pre-computed KNN graph.
     ///
     /// Python:
-    ///   uv = (x[v1] - x[v0]) / norm        (unit edge vectors)
-    ///   scalar_proj = v[v0] · uv            (dot product per edge)
-    ///   p = clip(scalar_proj + epsilon, 0) / norms
-    ///   tr = normalize(coo_matrix((p, (v0, v1))), norm='l1')
+    /// ```text
+    /// uv = (x[v1] - x[v0]) / norm        (unit edge vectors)
+    /// scalar_proj = v[v0] · uv            (dot product per edge)
+    /// p = clip(scalar_proj + epsilon, 0) / norms
+    /// tr = normalize(coo_matrix((p, (v0, v1))), norm='l1')
+    /// ```
     pub fn compute_transition_matrix(
         &self,
         knn: &CsMat<f64>,
@@ -134,9 +136,9 @@ impl Diffusion {
     /// Supported modes:
     /// - `"path_integral"` → accumulate intermediate distributions, return Array2
     /// - `"time_evolution"` → return final distribution as Array2
-    /// - `"map_trajectory"` → argmax at each step, return Vec<usize>
-    /// - `"frontier"` → argmax of relative growth, return Vec<usize>
-    /// - `"trajectory"` → random-walk trajectory, return Vec<usize>
+    /// - `"map_trajectory"` → argmax at each step, return `Vec<usize>`
+    /// - `"frontier"` → argmax of relative growth, return `Vec<usize>`
+    /// - `"trajectory"` → random-walk trajectory, return `Vec<usize>`
     pub fn diffuse(
         &self,
         x_init: &Array2<f64>,

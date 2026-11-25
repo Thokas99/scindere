@@ -36,7 +36,7 @@ impl Default for Molitem {
     }
 }
 
-/// Set union (|) on HashMap<usize, Vec<SegmentMatch>>:
+/// Set union (`HashMap<usize, Vec<SegmentMatch>>`):
 /// keys = union of both key sets; values = concatenated vecs.
 pub fn dictionary_union(
     mut d1: HashMap<usize, Vec<SegmentMatch>>,
@@ -48,7 +48,7 @@ pub fn dictionary_union(
     d1
 }
 
-/// Set intersection (&) on HashMap<usize, Vec<SegmentMatch>>:
+/// Set intersection (`HashMap<usize, Vec<SegmentMatch>>`):
 /// keys = intersection of both key sets; values = concatenated vecs.
 pub fn dictionary_intersect(
     mut d1: HashMap<usize, Vec<SegmentMatch>>,

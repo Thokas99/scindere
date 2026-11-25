@@ -78,7 +78,8 @@ for platform workflows, configuration, checkpoint recovery and output details.
 
 **[Read the Scindere documentation](https://thokas99.github.io/scindere/)** for
 installation, usage, configuration, output formats, troubleshooting,
-architecture, benchmarks and development guidance.
+the [Rust API](https://thokas99.github.io/scindere/api.html), benchmarks and
+[development guidance](https://thokas99.github.io/scindere/development/).
 
 ## Citation and acknowledgements
 

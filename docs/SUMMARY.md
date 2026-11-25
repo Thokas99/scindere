@@ -16,10 +16,12 @@
 # Architecture and development
 
 - [Architecture overview](architecture/overview.md)
+- [Development overview](development/index.md)
 - [Checkpoint format](development/checkpoints.md)
 - [Roadmap](development/roadmap.md)
 - [Contributing](development/contributing.md)
 - [Release process](development/release.md)
+- [Rust API reference](api.md)
 
 # Project
 
