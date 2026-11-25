@@ -7,7 +7,7 @@ Scindere builds on velocyto-derived classification rules. The [architecture over
 - [Contributing and validation](contributing.md)
 - [Checkpoint format and compatibility](checkpoints.md)
 - [Release process](release.md)
-- [Benchmark records](../benchmarks/README.md)
+- [Benchmark records](../benchmarks/index.html)
 - [Rust API reference](../api.md)
 
 Run the commands in the contributing guide before proposing code changes. Preserve exact count layers, identifiers and checkpoint resume behavior when changing counting or output code.

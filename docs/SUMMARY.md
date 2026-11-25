@@ -26,4 +26,5 @@
 # Project
 
 - [Benchmarks](benchmarks/README.md)
+- [Compact evidence benchmark](benchmarks/results/compact-evidence-200k.md)
 - [Provenance](provenance.md)

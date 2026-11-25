@@ -40,7 +40,9 @@ impl CompactMolitem {
                 }
             }
         }
-        if retained_indices != self.transcript_indices {
+        if retained_indices.is_empty() {
+            existing = Vec::new();
+        } else if retained_indices != self.transcript_indices {
             existing.retain(|matched| {
                 retained_indices
                     .binary_search(&transcript_idx(matched))
@@ -162,6 +164,24 @@ mod tests {
         molecule.add_mapping(Vec::new());
         molecule.add_mapping(vec![segment(2, 1, (21, 30))]);
 
+        assert!(molecule.materialize().mappings_record.unwrap().is_empty());
+    }
+
+    #[test]
+    fn disjoint_mapping_releases_unusable_evidence_capacity() {
+        let mut molecule = CompactMolitem::default();
+        molecule.add_mapping(vec![
+            segment(2, 0, (20, 29)),
+            segment(2, 1, (30, 39)),
+            segment(2, 2, (40, 49)),
+        ]);
+        assert!(molecule.mappings.as_ref().unwrap().capacity() >= 3);
+
+        molecule.add_mapping(vec![segment(3, 0, (50, 59))]);
+        assert!(molecule.transcript_indices.is_empty());
+        assert_eq!(molecule.mappings.as_ref().unwrap().capacity(), 0);
+
+        molecule.add_mapping(vec![segment(2, 3, (60, 69))]);
         assert!(molecule.materialize().mappings_record.unwrap().is_empty());
     }
 

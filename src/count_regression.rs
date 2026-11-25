@@ -78,6 +78,38 @@ fn high_multiplicity_fixture(dir: &Path) -> (String, String) {
     (bam, gtf)
 }
 
+fn reverse_strand_fixture(dir: &Path) -> (String, String, String) {
+    let gtf = dir.join("reverse.gtf");
+    std::fs::write(
+        &gtf,
+        concat!(
+            "chr1\ttest\texon\t100\t199\t.\t-\t.\tgene_id \"Gminus\"; transcript_id \"Tminus\"; gene_name \"ReverseGene\"; exon_number \"1\";\n",
+            "chr1\ttest\texon\t300\t399\t.\t-\t.\tgene_id \"Gminus\"; transcript_id \"Tminus\"; gene_name \"ReverseGene\"; exon_number \"2\";\n",
+        ),
+    )
+    .unwrap();
+    let repeats = dir.join("repeats.gtf");
+    std::fs::write(
+        &repeats,
+        concat!(
+            "chr1\ttest\trepeat\t100\t199\t.\t+\t.\tgene_id \"R1\";\n",
+            "chr1\ttest\trepeat\t300\t399\t.\t+\t.\tgene_id \"R2\";\n",
+        ),
+    )
+    .unwrap();
+    let sam = concat!(
+        "@HD\tVN:1.6\tSO:coordinate\n@SQ\tSN:chr1\tLN:1000\n",
+        "reverse_gene\t0\tchr1\t120\t255\t30M\t*\t0\t0\t*\t*\tCB:Z:a\tMA:Z:reverse\tNH:i:1\tST:Z:S1\n",
+    );
+    let bam = dir.join("reverse.bam");
+    write_bam(&bam, sam);
+    (
+        bam.to_string_lossy().into(),
+        gtf.to_string_lossy().into(),
+        repeats.to_string_lossy().into(),
+    )
+}
+
 fn tag_edge_fixture(dir: &Path) -> (String, String) {
     let (bam, gtf) = fixture(dir);
     let sam = concat!(
@@ -281,7 +313,9 @@ fn high_multiplicity_umi_matches_collecting_and_streaming_counts() {
     for (layer, arrays) in layers {
         expected.insert((layer, keys[0].clone()), arrays[0].column(0).to_vec());
     }
-    assert_eq!(expected.values().flatten().copied().sum::<u32>(), 1);
+    assert_eq!(expected[&(String::from("spliced"), keys[0].clone())], [1]);
+    assert_eq!(expected[&(String::from("unspliced"), keys[0].clone())], [0]);
+    assert_eq!(expected[&(String::from("ambiguous"), keys[0].clone())], [0]);
 
     let mut streaming = counter(&gtf, &bam, "Default");
     let mut observed = HashMap::new();
@@ -295,6 +329,34 @@ fn high_multiplicity_umi_matches_collecting_and_streaming_counts() {
         })
         .unwrap();
     assert_eq!(observed, expected);
+}
+
+#[test]
+fn reverse_strand_fallback_paths_match_fixed_layer_counts() {
+    let dir = tempfile::tempdir().unwrap();
+    let (bam, gtf, repeats) = reverse_strand_fixture(dir.path());
+    for (logic, use_repeats, expected_spliced) in [
+        ("Default", false, 0),
+        ("Discordant10X", true, 1),
+        ("SmartSeq2", false, 1),
+    ] {
+        let mut c = counter(&gtf, &bam, logic);
+        if use_repeats {
+            c.read_repeats(&repeats, 0).unwrap();
+        }
+        let (layers, keys) = c.count(&bam, false, 100).unwrap();
+        assert_eq!(keys, ["|a"], "logic {logic}");
+        let counts: HashMap<_, _> = layers
+            .into_iter()
+            .map(|(layer, arrays)| (layer, arrays[0].column(0).to_vec()))
+            .collect();
+        assert_eq!(counts["spliced"], [expected_spliced], "logic {logic}");
+        assert_eq!(counts["unspliced"], [0], "logic {logic}");
+        assert_eq!(counts["ambiguous"], [0], "logic {logic}");
+        if logic == "SmartSeq2" {
+            assert_eq!(counts["spanning"], [0]);
+        }
+    }
 }
 
 #[test]
