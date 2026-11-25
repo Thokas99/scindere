@@ -507,7 +507,8 @@ fn fresh_counter_resumes_second_bam_with_interleaved_samples() {
             }
         }
     }
-    let baseline: [(&str, &str, &[(u32, u32)]); 18] = [
+    type BaselineCount = (&'static str, &'static str, &'static [(u32, u32)]);
+    let baseline: [BaselineCount; 18] = [
         ("ambiguous", "S1|a", &[(0, 1)]),
         ("ambiguous", "S1|b", &[]),
         ("ambiguous", "S1|c", &[(0, 1)]),
