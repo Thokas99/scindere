@@ -17,6 +17,7 @@ pub mod bam_sort;
     clippy::writeln_empty_string
 )]
 pub mod commands;
+pub(crate) mod compact_evidence;
 pub mod constants;
 pub mod count_checkpoint;
 pub mod count_output;
