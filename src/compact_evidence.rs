@@ -104,13 +104,17 @@ mod tests {
         SegmentMatch::new(
             coords,
             feature_idx,
-            feature_idx % 2 == 1,
+            !feature_idx.is_multiple_of(2),
             Feature {
                 start: coords.0 - 2,
                 end: coords.1 + 2,
-                kind: if feature_idx % 2 == 0 { b'e' } else { b'i' },
+                kind: if feature_idx.is_multiple_of(2) {
+                    b'e'
+                } else {
+                    b'i'
+                },
                 exin_no: transcript_idx as i64,
-                is_validated: transcript_idx % 2 == 0,
+                is_validated: transcript_idx.is_multiple_of(2),
                 transcript_model_idx: Some(transcript_idx),
             },
         )

@@ -1,3 +1,9 @@
+//! Scindere's Rust API for RNA splicing quantification.
+//!
+//! [`counter::ExInCounter`] provides collecting `count()` and batch-oriented
+//! `count_stream()` APIs. Classification rules implement [`logic::Logic`];
+//! durable batch storage is exposed through [`count_checkpoint`].
+
 #![allow(unused_variables, unused_imports, unused_mut, non_snake_case)]
 
 pub mod analysis;
@@ -17,6 +23,7 @@ pub mod bam_sort;
     clippy::writeln_empty_string
 )]
 pub mod commands;
+#[cfg_attr(not(feature = "bam"), allow(dead_code))]
 pub(crate) mod compact_evidence;
 pub mod constants;
 pub mod count_checkpoint;

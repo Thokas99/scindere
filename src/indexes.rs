@@ -241,15 +241,16 @@ impl FeatureIndex {
             let mut i = self.iidx;
             while i < self.maxiidx && self.ivls[i].doesnt_start_after(*segment) {
                 let seg_len = segment.1 - segment.0;
-                if self.ivls[i].intersects(*segment, MIN_FLANK) && seg_len > MIN_FLANK {
-                    if self.ivls[i].transcript_model_idx.is_some() {
-                        mapping_record.push(SegmentMatch::new(
-                            *segment,
-                            i,
-                            read.is_spliced(),
-                            self.ivls[i].clone(),
-                        ));
-                    }
+                if self.ivls[i].intersects(*segment, MIN_FLANK)
+                    && seg_len > MIN_FLANK
+                    && self.ivls[i].transcript_model_idx.is_some()
+                {
+                    mapping_record.push(SegmentMatch::new(
+                        *segment,
+                        i,
+                        read.is_spliced(),
+                        self.ivls[i].clone(),
+                    ));
                 }
                 i += 1;
             }
