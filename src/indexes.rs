@@ -1,5 +1,6 @@
 //! Translated from velocyto/indexes.py
 
+use crate::compact_evidence::CompactSegmentMatch;
 use crate::constants::{MATCH_INSIDE, MATCH_OVER3END, MATCH_OVER5END, MIN_FLANK};
 use crate::feature::Feature; // used in ivls Vec<Feature> and mark_overlapping_ivls
 use crate::read::Read;
@@ -208,7 +209,26 @@ impl FeatureIndex {
     /// Post-processes: keep only max-segment-count TMs, then remove any where a SKIP doesn't make sense.
     pub fn find_overlapping_ivls(&mut self, read: &Read) -> HashMap<usize, Vec<SegmentMatch>> {
         let mut mapping_record: HashMap<usize, Vec<SegmentMatch>> = HashMap::new();
+        for matched in self.find_overlapping_ivls_compact(read) {
+            mapping_record
+                .entry(matched.transcript_idx)
+                .or_default()
+                .push(SegmentMatch::new(
+                    matched.segment,
+                    matched.feature_idx,
+                    matched.is_spliced,
+                    matched.feature,
+                ));
+        }
+        mapping_record
+    }
 
+    /// Return sorted, flat overlap evidence after the shared transcript filters.
+    pub(crate) fn find_overlapping_ivls_compact(
+        &mut self,
+        read: &Read,
+    ) -> Vec<CompactSegmentMatch> {
+        let mut mapping_record = Vec::new();
         if self.ivls.is_empty() {
             return mapping_record;
         }
@@ -223,33 +243,41 @@ impl FeatureIndex {
                 let seg_len = segment.1 - segment.0;
                 if self.ivls[i].intersects(*segment, MIN_FLANK) && seg_len > MIN_FLANK {
                     if let Some(tm_idx) = self.ivls[i].transcript_model_idx {
-                        mapping_record
-                            .entry(tm_idx)
-                            .or_default()
-                            .push(SegmentMatch::new(
-                                *segment,
-                                i,
-                                read.is_spliced(),
-                                self.ivls[i].clone(),
-                            ));
+                        mapping_record.push(CompactSegmentMatch {
+                            transcript_idx: tm_idx,
+                            segment: *segment,
+                            feature_idx: i,
+                            is_spliced: read.is_spliced(),
+                            feature: self.ivls[i].clone(),
+                        });
                     }
                 }
                 i += 1;
             }
         }
 
-        // Post-process step 1: remove transcript models with fewer segments than the max
-        if !mapping_record.is_empty() {
-            let max_n_segments = mapping_record.values().map(|v| v.len()).max().unwrap_or(0);
-            mapping_record.retain(|_, v| v.len() >= max_n_segments);
+        let mut transcript_stats = HashMap::new();
+        for matched in &mapping_record {
+            let stats = transcript_stats
+                .entry(matched.transcript_idx)
+                .or_insert((0, true));
+            stats.0 += 1;
+            stats.1 &= SegmentMatch::skip_makes_sense_for(
+                matched.segment,
+                matched.is_spliced,
+                &matched.feature,
+            );
         }
-
-        // Post-process step 2: remove TMs where any SegmentMatch skip doesn't make sense
-        if !mapping_record.is_empty() {
-            mapping_record
-                .retain(|_, segmatch_list| segmatch_list.iter().all(|sm| sm.skip_makes_sense()));
-        }
-
+        let max_n_segments = transcript_stats
+            .values()
+            .map(|(count, _)| *count)
+            .max()
+            .unwrap_or(0);
+        mapping_record.retain(|matched| {
+            let (count, valid) = transcript_stats[&matched.transcript_idx];
+            count == max_n_segments && valid
+        });
+        mapping_record.sort_by_key(|matched| matched.transcript_idx);
         mapping_record
     }
 }
@@ -330,6 +358,46 @@ mod tests {
         let read = make_read(100, vec![(100, 200)], false);
         let result = fidx.find_overlapping_ivls(&read);
         assert!(result.is_empty());
+    }
+
+    #[test]
+    fn compact_overlap_matches_public_output_and_rejects_invalid_splice() {
+        let features = vec![
+            Feature::new(100, 200, b'e', 1, Some(3)),
+            Feature::new(105, 195, b'i', 1, Some(1)),
+            Feature::new(210, 310, b'e', 2, Some(3)),
+            Feature::new(300, 400, b'e', 3, Some(3)),
+            Feature::new(1000, 1100, b'e', 3, None),
+        ];
+        let read = make_read(120, vec![(120, 150), (220, 250)], false);
+        let mut public_index = FeatureIndex::new(features.clone());
+        let public = public_index.find_overlapping_ivls(&read);
+        let mut compact_index = FeatureIndex::new(features.clone());
+        let compact = compact_index.find_overlapping_ivls_compact(&read);
+
+        assert_eq!(public.len(), 1);
+        assert_eq!(public[&3].len(), 2);
+        assert_eq!(compact.len(), 2);
+        for (compact_match, public_match) in compact.iter().zip(&public[&3]) {
+            assert_eq!(compact_match.transcript_idx, 3);
+            assert_eq!(compact_match.segment, public_match.segment);
+            assert_eq!(compact_match.feature_idx, public_match.feature_idx);
+            assert_eq!(compact_match.is_spliced, public_match.is_spliced);
+            assert_eq!(compact_match.feature.start, public_match.feature.start);
+            assert_eq!(compact_match.feature.end, public_match.feature.end);
+            assert_eq!(compact_match.feature.kind, public_match.feature.kind);
+            assert_eq!(compact_match.feature.exin_no, public_match.feature.exin_no);
+        }
+
+        let invalid_splice = make_read(120, vec![(120, 150), (300, 340)], true);
+        let mut public_index = FeatureIndex::new(features.clone());
+        assert!(public_index
+            .find_overlapping_ivls(&invalid_splice)
+            .is_empty());
+        let mut compact_index = FeatureIndex::new(features);
+        assert!(compact_index
+            .find_overlapping_ivls_compact(&invalid_splice)
+            .is_empty());
     }
 
     #[test]

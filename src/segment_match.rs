@@ -41,11 +41,19 @@ impl SegmentMatch {
     /// skip_makes_sense: if not spliced return true;
     /// else check if the segment boundary aligns with the feature boundary within SPLIC_INACUR.
     pub fn skip_makes_sense(&self) -> bool {
-        if !self.is_spliced {
+        Self::skip_makes_sense_for(self.segment, self.is_spliced, &self.feature)
+    }
+
+    pub(crate) fn skip_makes_sense_for(
+        segment: (i64, i64),
+        is_spliced: bool,
+        feature: &Feature,
+    ) -> bool {
+        if !is_spliced {
             return true;
         }
-        (self.feature.start - self.segment.0).abs() <= SPLIC_INACUR
-            || (self.feature.end - self.segment.1).abs() <= SPLIC_INACUR
+        (feature.start - segment.0).abs() <= SPLIC_INACUR
+            || (feature.end - segment.1).abs() <= SPLIC_INACUR
     }
 }
 
