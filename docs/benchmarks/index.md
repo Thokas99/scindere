@@ -31,5 +31,18 @@ target/release/examples/compact_evidence_bench generate /tmp/high-umi.bam /tmp/g
 The program checks that each run counts one molecule. For the baseline, copy
 the example into a checkout of `84ca23c` and build it there.
 
-Earlier [dense-storage and checkpoint measurements](https://github.com/Thokas99/scindere/tree/main/docs/benchmarks/results)
-record separate workloads and should not be compared directly with this case.
+## Earlier synthetic storage records
+
+The [count-storage example](https://github.com/Thokas99/scindere/blob/main/examples/count_storage_bench.rs) writes
+synthetic matrices with one nonzero per layer per cell. These preserved JSON
+records measure storage paths and child-process resource use; they do not model
+BAM parsing, representative sequencing data, or whole-job memory:
+
+- [Dense storage, 3,000 × 10,000](results/dense-3000x10000.json)
+- [Checkpoint storage, 3,000 × 10,000](results/checkpoint-3000x10000.json)
+- [Checkpoint storage, 187,000 × 30,000](results/checkpoint-187000x30000.json)
+
+The stored reports include process wall time, peak RSS and sampled disk-use
+details. Sampling and cache limitations are recorded in each JSON file. These
+workloads differ from the 200,000-read counting case above and should not be
+compared directly.

@@ -16,4 +16,12 @@ The internal counter stores each molecule's evidence in a flat vector. It materi
 - Sparse checkpoint shards are durable count storage. Dense arrays remain the scratch representation during classification.
 - Sorting uses separate thread and memory settings and consults host, cgroup and Slurm limits.
 
-A group that exceeds the count estimate fails explicitly; previously committed checkpoints remain available. See [configuration](../configuration.md), [output and checkpoint recovery](../output.md#checkpoint-format-and-compatibility) and the [roadmap](../development/roadmap.md) for details.
+A group that exceeds the count estimate fails explicitly; previously committed checkpoints remain available. See [configuration](../configuration.md), [output and checkpoint recovery](../output.md#checkpoint-format-and-compatibility) and [benchmarks](../benchmarks/index.md) for the current measurement scope.
+
+## Current execution limits
+
+Barcode counting is sequential; Scindere does not currently schedule barcode
+groups across parallel workers. The count-memory setting covers counting
+components only, while sorting and output have separate resource use. The
+implementation does not provide one process-wide memory cap or adaptive global
+budget.

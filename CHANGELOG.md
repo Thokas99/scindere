@@ -11,4 +11,4 @@
 - Establish Scindere as an independent project while preserving the inherited counting interface, checkpoint format and H5AD/Loom behavior.
 - Carry forward bounded batch counting, sparse checkpointing, streamed export and execution telemetry.
 
-The history before Scindere, including contributions inherited from velocyto-rs-lite, is documented in [project provenance](docs/provenance.md).
+The history before Scindere, including contributions inherited from velocyto-rs-lite, is documented in [Citation & Credits](docs/citation.md).

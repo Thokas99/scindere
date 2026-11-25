@@ -1,28 +1,25 @@
 # Summary
 
-[Scindere documentation](README.md)
+- [Scindere](README.md)
 
 # Getting Started
 
 - [Installation](installation.md)
-- [Quick start and workflows](usage.md)
+- [Quick Start](quick-start.md)
+- [Supported Workflows](supported-workflows.md)
 
 # User Guide
 
 - [Configuration](configuration.md)
-- [Output and checkpoint recovery](output.md)
+- [Output & Recovery](output.md)
 - [Troubleshooting](troubleshooting.md)
 
-# Technical Reference
+# Reference
 
-- [Architecture overview](architecture/overview.md)
-- [Rust API reference](api.md)
-
-# Project
-
-- [Roadmap](development/roadmap.md)
-- [Contributing](development/contributing.md)
-- [Release process](development/release.md)
-- [Development archive](superpowers/archive/index.md)
-- [Provenance and citations](provenance.md)
+- [Architecture](architecture/overview.md)
 - [Benchmarks](benchmarks/index.md)
+- [Rust API](api.md)
+
+# About
+
+- [Citation & Credits](citation.md)

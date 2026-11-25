@@ -1,10 +1,19 @@
+:root {
+    --content-max-width: 1080px;
+    --page-padding: 24px;
+}
+
 html.light,
 html.rust {
-    --scindere-ink: #253746;
-    --scindere-muted: #526477;
-    --scindere-link: #126d68;
-    --scindere-accent: #7655a6;
-    --scindere-button-text: #fff;
+    --scindere-ink: #22333b;
+    --scindere-muted: #52656d;
+    --scindere-link: #086b63;
+    --scindere-accent: #725486;
+    --scindere-surface: #f1f6f5;
+    --scindere-border: #c4d2cf;
+    --scindere-rule: #d6e0de;
+    --scindere-focus: #74518b;
+    --scindere-button-text: #ffffff;
     --links: var(--scindere-link);
     --sidebar-active: var(--scindere-link);
     --quote-border: var(--scindere-accent);
@@ -13,11 +22,15 @@ html.rust {
 html.coal,
 html.navy,
 html.ayu {
-    --scindere-ink: #e5edf3;
-    --scindere-muted: #b5c2ce;
-    --scindere-link: #79d5ca;
-    --scindere-accent: #c2a9e2;
-    --scindere-button-text: #142c31;
+    --scindere-ink: #e5eeec;
+    --scindere-muted: #b6c6c3;
+    --scindere-link: #79d4c4;
+    --scindere-accent: #c5a8db;
+    --scindere-surface: #202d31;
+    --scindere-border: #48595d;
+    --scindere-rule: #3a4b4f;
+    --scindere-focus: #e3c9f3;
+    --scindere-button-text: #132a29;
     --links: var(--scindere-link);
     --sidebar-active: var(--scindere-link);
     --quote-border: var(--scindere-accent);
@@ -25,66 +38,326 @@ html.ayu {
 
 .content main {
     color: var(--scindere-ink);
+    font-size: 1.6rem;
+    line-height: 1.7;
+}
+
+.content main p,
+.content main ul,
+.content main ol {
+    max-width: 78ch;
+}
+
+.content main h1 {
+    color: var(--scindere-ink);
+    font-size: clamp(2.8rem, 6vw, 4rem);
+    line-height: 1.12;
 }
 
 .content main h2 {
-    border-left: 3px solid var(--scindere-accent);
-    padding-left: 0.65rem;
+    margin-top: 2.5rem;
+    border-bottom: 1px solid var(--scindere-rule);
+    padding-bottom: 0.35rem;
+}
+
+.content main h3 {
+    color: var(--scindere-ink);
+}
+
+.content main a {
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.16em;
 }
 
 .content main a:focus-visible,
-.landing-button:focus-visible {
-    outline: 3px solid var(--scindere-accent);
+#mdbook-theme-toggle:focus-visible {
+    outline: 3px solid var(--scindere-focus);
     outline-offset: 3px;
+    border-radius: 3px;
 }
 
-.landing-hero {
-    max-width: 780px;
-    margin: 0 auto 2rem;
+.chapter-item a > strong[aria-hidden="true"] {
+    display: none;
+}
+
+body.sidebar-iframe-inner .chapter .section,
+#mdbook-sidebar .chapter .section {
+    display: none;
+}
+
+#mdbook-theme-toggle::after {
+    content: "Theme";
+    margin-left: 0.5rem;
+    font-size: 1.3rem;
+    white-space: nowrap;
+}
+
+.content main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.content main img {
+    max-width: 100%;
+    height: auto;
+}
+
+.home-hero {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.75fr) minmax(0, 1.4fr);
+    align-items: center;
+    gap: 2.5rem;
+    margin: 1.2rem 0 3rem;
+    padding: 2rem;
+    border-left: 4px solid var(--scindere-link);
+    background: var(--scindere-surface);
+}
+
+.home-brand {
     text-align: center;
 }
 
-.landing-mark {
+.home-brand-copy {
+    min-width: 0;
+}
+
+.home-mark {
     display: block;
-    width: 88px;
+    width: 120px;
     height: auto;
-    margin: 0 auto 0.75rem;
+    margin: 0 auto 0.8rem;
 }
 
-.content main .landing-hero h1 {
-    margin: 0.25rem 0 0.5rem;
-    border: 0;
-    padding: 0;
+.content main .home-kicker {
+    margin: 0 0 0.2rem;
+    color: var(--scindere-muted);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
 }
 
-.content main .landing-tagline {
+.content main .home-brand h1 {
+    margin: 0;
+    font-size: clamp(3.4rem, 6vw, 4.8rem);
+}
+
+.content main .home-tagline {
+    max-width: 28ch;
+    margin: 0 0 0.8rem;
     color: var(--scindere-link);
-    font-size: 1.2em;
+    font-size: clamp(1.9rem, 2.6vw, 2.4rem);
     font-weight: 650;
+    line-height: 1.35;
 }
 
-.landing-actions {
+.content main .home-introduction > p:not(.home-tagline) {
+    max-width: 68ch;
+    color: var(--scindere-muted);
+}
+
+.home-actions {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.75rem;
+    margin-top: 1.3rem;
 }
 
-.landing-button {
-    display: inline-block;
+.home-button {
+    display: inline-flex;
     min-height: 44px;
+    align-items: center;
     padding: 0.55rem 0.9rem;
     border: 1px solid var(--scindere-link);
-    border-radius: 0.35rem;
-    line-height: 1.5;
-    text-decoration: none;
+    border-radius: 0.25rem;
+    font-weight: 650;
+    text-decoration: none !important;
 }
 
-.landing-button-primary {
+.home-button-primary {
     background: var(--scindere-link);
     color: var(--scindere-button-text) !important;
 }
 
-.landing-button-secondary {
+.home-button-secondary {
     color: var(--scindere-link) !important;
+}
+
+.home-button:hover {
+    text-decoration: underline !important;
+}
+
+.content main .home-section-intro {
+    max-width: 72ch;
+    margin-bottom: 1.4rem;
+    color: var(--scindere-muted);
+}
+
+.content main .home-workflow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.1rem;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: home-step;
+}
+
+.home-workflow li {
+    min-width: 0;
+    padding: 1rem 0.35rem 0.5rem;
+    border-top: 2px solid var(--scindere-link);
+    counter-increment: home-step;
+}
+
+.home-workflow li:nth-child(even) {
+    border-color: var(--scindere-accent);
+}
+
+.home-workflow li::before {
+    content: "0" counter(home-step);
+    display: block;
+    margin-bottom: 0.8rem;
+    color: var(--scindere-muted);
+    font-size: 1.2rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+}
+
+.content main .home-workflow li h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.7rem;
+}
+
+.content main .home-workflow li p {
+    margin: 0;
+    color: var(--scindere-muted);
+    font-size: 1.45rem;
+    line-height: 1.55;
+}
+
+.home-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.2rem 0 1.7rem;
+}
+
+.home-feature {
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--scindere-border);
+    border-top: 2px solid var(--scindere-link);
+    background: var(--scindere-surface);
+}
+
+.home-feature:nth-child(even) {
+    border-top-color: var(--scindere-accent);
+}
+
+.content main .home-feature h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.7rem;
+}
+
+.content main .home-feature p {
+    margin: 0;
+    color: var(--scindere-muted);
+    font-size: 1.45rem;
+    line-height: 1.6;
+}
+
+.home-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    max-width: none;
+    margin: 0 0 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--scindere-rule);
+    border-bottom: 1px solid var(--scindere-rule);
+}
+
+.home-facts div {
+    min-width: 0;
+}
+
+.home-facts dt {
+    color: var(--scindere-muted);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.home-facts dd {
+    margin: 0.2rem 0 0;
+}
+
+@media (max-width: 800px) {
+    .home-hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    .home-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        text-align: left;
+    }
+
+    .home-mark {
+        width: 92px;
+        flex: 0 0 auto;
+        margin: 0;
+    }
+
+    .content main .home-kicker {
+        margin-bottom: 0.1rem;
+    }
+
+    .content main .home-workflow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    :root {
+        --page-padding: 16px;
+    }
+
+    .home-hero {
+        margin-top: 0.5rem;
+        padding: 1.2rem;
+    }
+
+    .home-brand {
+        justify-content: flex-start;
+    }
+
+    .home-mark {
+        width: 72px;
+    }
+
+    .content main .home-workflow,
+    .home-feature-grid,
+    .home-facts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .home-workflow li {
+        padding-top: 0.8rem;
+    }
+
+    .home-feature {
+        padding: 0.9rem 1rem;
+    }
+
+    .content main pre,
+    .content main pre code {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
 }
