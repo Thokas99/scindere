@@ -2,29 +2,27 @@
 
 [Scindere documentation](README.md)
 
-# Start here
+# Getting Started
 
 - [Installation](installation.md)
-- [Usage](usage.md)
+- [Quick start and workflows](usage.md)
 
-# Guides
+# User Guide
 
 - [Configuration](configuration.md)
-- [Output and checkpoints](output.md)
+- [Output and checkpoint recovery](output.md)
 - [Troubleshooting](troubleshooting.md)
 
-# Architecture and development
+# Technical Reference
 
 - [Architecture overview](architecture/overview.md)
-- [Development overview](development/index.md)
-- [Checkpoint format](development/checkpoints.md)
-- [Roadmap](development/roadmap.md)
-- [Contributing](development/contributing.md)
-- [Release process](development/release.md)
 - [Rust API reference](api.md)
 
 # Project
 
-- [Benchmarks](benchmarks/README.md)
-- [Compact evidence benchmark](benchmarks/results/compact-evidence-200k.md)
-- [Provenance](provenance.md)
+- [Roadmap](development/roadmap.md)
+- [Contributing](development/contributing.md)
+- [Release process](development/release.md)
+- [Development archive](superpowers/archive/index.md)
+- [Provenance and citations](provenance.md)
+- [Benchmarks](benchmarks/index.md)

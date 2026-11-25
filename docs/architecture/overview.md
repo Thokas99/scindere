@@ -16,4 +16,4 @@ The internal counter stores each molecule's evidence in a flat vector. It materi
 - Sparse checkpoint shards are durable count storage. Dense arrays remain the scratch representation during classification.
 - Sorting uses separate thread and memory settings and consults host, cgroup and Slurm limits.
 
-A group that exceeds the count estimate fails explicitly; previously committed checkpoints remain available. See [configuration](../configuration.md), [checkpoint compatibility](../development/checkpoints.md) and the [roadmap](../development/roadmap.md) for details.
+A group that exceeds the count estimate fails explicitly; previously committed checkpoints remain available. See [configuration](../configuration.md), [output and checkpoint recovery](../output.md#checkpoint-format-and-compatibility) and the [roadmap](../development/roadmap.md) for details.

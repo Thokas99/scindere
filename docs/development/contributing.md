@@ -34,6 +34,6 @@ The regression suite covers generated BAM fixtures, checkpoint resume and corrup
 
 ## Compatibility and attribution
 
-Read [checkpoint compatibility](checkpoints.md) before changing serialization. Keep feature claims in the project README aligned with the implementation and [roadmap](roadmap.md). Preserve upstream notices and scientific credit; see [project provenance](../provenance.md).
+Read [output and checkpoint recovery](../output.md#checkpoint-format-and-compatibility) before changing serialization. Keep feature claims in the project README aligned with the implementation and [roadmap](roadmap.md). Preserve upstream notices and scientific credit; see [project provenance](../provenance.md).
 
 Scindere is not currently publishable to crates.io. Do not change Cargo.toml publication settings or create releases as part of a routine code change.

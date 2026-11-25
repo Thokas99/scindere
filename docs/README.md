@@ -1,31 +1,23 @@
 <div class="landing-hero">
-  <img class="landing-mark" src="assets/scindere-mark.svg" alt="" width="104" height="66">
-  <p class="landing-eyebrow">SCINDERE DOCUMENTATION</p>
+  <img class="landing-mark" src="assets/scindere-mark.svg" alt="Scindere branching transcript mark" width="88" height="56">
   <h1>Scindere</h1>
-  <p class="landing-tagline">RNA splicing quantification for single-cell data.</p>
-  <p class="landing-intro">Count spliced, unspliced and ambiguous molecules from BAM alignments with a matching GTF and cell barcodes.</p>
+  <p class="landing-tagline">Resource-aware molecule quantification for RNA velocity workflows.</p>
+  <p>Count spliced, unspliced and ambiguous molecules from BAM alignments and a matching GTF. Scindere does not infer velocity; its classification follows velocyto.</p>
   <div class="landing-actions">
-    <a class="landing-button landing-button-primary" href="installation.html">Install</a>
-    <a class="landing-button landing-button-secondary" href="usage.html">Run Scindere</a>
+    <a class="landing-button landing-button-primary" href="installation.html">Installation</a>
+    <a class="landing-button landing-button-secondary" href="https://github.com/Thokas99/scindere">GitHub</a>
   </div>
 </div>
 
-## Count layers
+## Core capabilities
 
-Scindere applies velocyto-derived molecule classification and writes H5AD or Loom output. Count batches use dense scratch arrays; sparse checkpoints and streamed output keep completed batches small.
+- Sequential counting in bounded, complete-barcode batches with resumable sparse checkpoints.
+- H5AD and Loom output for generic BAM, 10x, BD Rhapsody, DropEst and Smart-seq2 workflows.
+- Resource estimates and run telemetry. `--count-memory-mb` estimates counting components, not process-wide RSS.
 
-<div class="count-layers" role="group" aria-label="Output molecule count layers">
-  <div class="count-layer"><span class="layer-symbol layer-spliced" aria-hidden="true">●</span><strong>Spliced</strong></div>
-  <div class="count-layer"><span class="layer-symbol layer-unspliced" aria-hidden="true">◆</span><strong>Unspliced</strong></div>
-  <div class="count-layer"><span class="layer-symbol layer-ambiguous" aria-hidden="true">■</span><strong>Ambiguous</strong></div>
-</div>
+## Quick start
 
-## Guides
-
-[Installation](installation.md) · [Usage](usage.md) · [Configuration](configuration.md) · [Output and checkpoints](output.md) · [Troubleshooting](troubleshooting.md)
-
-## Development
-
-[Development overview](development/index.md) · [Roadmap](development/roadmap.md) · [Rust API](api.md)
-
-Scindere carries forward the velocyto classification method and prior Rust implementation work. See [provenance and citations](provenance.md).
+```sh
+scindere run sample.bam genes.gtf --bcfile barcodes.tsv --cb-tag CB --ub-tag UB \
+  --sampleid sample --outputfolder results
+```

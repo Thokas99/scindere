@@ -8,7 +8,7 @@
 
 **Tech Stack:** mdBook 0.5.4, Markdown, a small local CSS theme, GitHub Actions, GitHub Pages.
 
-**Spec:** `docs/superpowers/specs/2026-11-24-github-pages-documentation-site-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-24-github-pages-documentation-site-design.md`
 
 ## Global Constraints
 

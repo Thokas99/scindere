@@ -11,7 +11,7 @@ This page tracks implemented work, remaining work and the evidence required to c
 ## 2. Compact molecule evidence — Partial
 
 - **Implemented:** All three counter paths store per-molecule evidence in flat vectors and intersect sorted transcript indices. Count regressions cover eight logic modes, high-multiplicity UMIs and interleaved-sample resume. Public mapping and `Logic::count` APIs and checkpoint format v2 remain unchanged.
-- **Evidence:** A 200,000-read synthetic case was 9 ms faster with no measurable RSS change; see the [benchmark record](../benchmarks/results/compact-evidence-200k.md).
+- **Evidence:** A 200,000-read synthetic case showed no measurable RSS change; see the [benchmark results](../benchmarks/index.md).
 - **Remaining:** Measure on representative BAMs and under constrained cgroups; test large barcode groups and exact resumed output.
 
 ## 3. Memory-aware parallel barcode counting — Planned
@@ -32,4 +32,4 @@ This page tracks implemented work, remaining work and the evidence required to c
 - **Remaining:** Per-molecule rejection reasons, reconciled classification summaries and standardized software-version provenance in outputs.
 - **Validation:** Reconcile diagnostics with checkpoint and matrix totals; verify known accepted and rejected molecules and H5AD/Loom metadata.
 
-See [contributing](contributing.md) for validation commands, [checkpoints](checkpoints.md) for compatibility rules and the [Rust API](../api.md) for library documentation.
+See [contributing](contributing.md) for validation commands, [output and checkpoint recovery](../output.md) for compatibility rules, and the [Rust API](../api.md) for library documentation. Archived implementation plans and design notes are in the [development archive](../superpowers/archive/index.md).
