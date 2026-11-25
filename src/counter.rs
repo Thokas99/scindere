@@ -2740,6 +2740,14 @@ mod tests {
             .attr_exists("encoding-type")
             .unwrap());
     }
+
+    #[cfg(feature = "bam")]
+    #[test]
+    fn empty_compact_mapping_does_not_consume_evidence_budget() {
+        let mut used = 17;
+        charge_compact_mapping(&Vec::new(), &mut used, 17).unwrap();
+        assert_eq!(used, 17);
+    }
 }
 
 #[cfg(feature = "bam")]
@@ -2748,6 +2756,9 @@ fn charge_compact_mapping(
     used: &mut usize,
     limit: usize,
 ) -> anyhow::Result<()> {
+    if mapping.is_empty() {
+        return Ok(());
+    }
     let transcript_count = mapping
         .windows(2)
         .filter(|pair| pair[0].feature.transcript_model_idx != pair[1].feature.transcript_model_idx)

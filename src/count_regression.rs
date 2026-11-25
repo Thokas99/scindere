@@ -200,10 +200,42 @@ fn streaming_matches_collecting_and_resumes_without_losing_lookahead() {
     ] {
         let mut original = counter(&gtf, &bam, logic);
         let (layers, keys) = original.count(&bam, false, 100).unwrap();
+        let mut sorted_keys = keys.clone();
+        sorted_keys.sort();
+        assert_eq!(sorted_keys, ["|a", "|b", "|c"], "logic {logic}");
         let mut expected = HashMap::new();
         for (layer, arrays) in layers {
             for (col, key) in keys.iter().enumerate() {
                 expected.insert((layer.clone(), key.clone()), arrays[0].column(col).to_vec());
+            }
+        }
+        let baseline_layers: &[(&str, u32)] = match logic {
+            "Default" | "Permissive10X" | "Discordant10X" => {
+                &[("ambiguous", 1), ("spliced", 2), ("unspliced", 1)]
+            }
+            "Intermediate10X" | "ValidatedIntrons10X" | "Stricter10X" | "ObservedSpanning10X" => {
+                &[("ambiguous", 1), ("spliced", 2), ("unspliced", 0)]
+            }
+            "SmartSeq2" => &[
+                ("ambiguous", 1),
+                ("spanning", 0),
+                ("spliced", 2),
+                ("unspliced", 1),
+            ],
+            _ => unreachable!("logic list above contains every baseline case"),
+        };
+        assert_eq!(
+            expected.len(),
+            baseline_layers.len() * keys.len(),
+            "logic {logic}"
+        );
+        for key in &keys {
+            for &(layer, count) in baseline_layers {
+                assert_eq!(
+                    expected[&(layer.to_string(), key.clone())],
+                    [count],
+                    "baseline {logic}/{layer}/{key}"
+                );
             }
         }
         let mut optimized = counter(&gtf, &bam, logic);
@@ -475,19 +507,30 @@ fn fresh_counter_resumes_second_bam_with_interleaved_samples() {
             }
         }
     }
-    let (layers, keys) = c.count(interleaved.to_str().unwrap(), false, 100).unwrap();
+    let baseline: [(&str, &str, &[(u32, u32)]); 18] = [
+        ("ambiguous", "S1|a", &[(0, 1)]),
+        ("ambiguous", "S1|b", &[]),
+        ("ambiguous", "S1|c", &[(0, 1)]),
+        ("ambiguous", "S2|a", &[]),
+        ("ambiguous", "S2|b", &[(0, 1)]),
+        ("ambiguous", "S2|c", &[]),
+        ("spliced", "S1|a", &[(0, 2)]),
+        ("spliced", "S1|b", &[(0, 1)]),
+        ("spliced", "S1|c", &[(0, 2)]),
+        ("spliced", "S2|a", &[(0, 1)]),
+        ("spliced", "S2|b", &[(0, 2)]),
+        ("spliced", "S2|c", &[(0, 1)]),
+        ("unspliced", "S1|a", &[]),
+        ("unspliced", "S1|b", &[(0, 1)]),
+        ("unspliced", "S1|c", &[]),
+        ("unspliced", "S2|a", &[(0, 1)]),
+        ("unspliced", "S2|b", &[]),
+        ("unspliced", "S2|c", &[(0, 1)]),
+    ];
     let mut expected = Vec::new();
     for _ in 0..2 {
-        for (name, arrays) in &layers {
-            for (col, key) in keys.iter().enumerate() {
-                let row: Vec<_> = arrays[0]
-                    .column(col)
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(g, &v)| (v > 0).then_some((g as u32, v)))
-                    .collect();
-                expected.push((name.clone(), key.clone(), row));
-            }
+        for &(layer, key, counts) in &baseline {
+            expected.push((layer.to_string(), key.to_string(), counts.to_vec()));
         }
     }
     observed.sort();
