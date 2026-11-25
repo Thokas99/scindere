@@ -1692,7 +1692,7 @@ impl ExInCounter {
             "batch: {repeats_reads_count} repeat-masked, {no_key_count} no-key, \
                 {no_overlap_count} no-overlap, {mapped_count} mapped"
         );
-        Ok(self.finalize_batch(cell_batch, &molitems))
+        Ok(self.finalize_batch(cell_batch, molitems))
     }
 
     /// Python: _count_cell_batch_stranded_discordant
@@ -1745,7 +1745,7 @@ impl ExInCounter {
             }
         }
         debug!("{repeats_reads_count} reads not considered because fully enclosed in repeat masked regions");
-        Ok(self.finalize_batch(cell_batch, &molitems))
+        Ok(self.finalize_batch(cell_batch, molitems))
     }
 
     /// Python: _count_cell_batch_non_stranded
@@ -1805,7 +1805,7 @@ impl ExInCounter {
             }
         }
         debug!("{repeats_reads_count} reads in repeat masked regions");
-        Ok(self.finalize_batch(cell_batch, &molitems))
+        Ok(self.finalize_batch(cell_batch, molitems))
     }
 
     /// Shared finalization: run logic.count for each molitem, return layer columns.
@@ -1813,7 +1813,7 @@ impl ExInCounter {
     fn finalize_batch(
         &self,
         cell_batch: &HashSet<String>,
-        molitems: &HashMap<String, CompactMolitem>,
+        molitems: HashMap<String, CompactMolitem>,
     ) -> (HashMap<String, ndarray::Array2<u32>>, Vec<String>) {
         let n_genes = self.geneid2ix.len();
         let n_cells = cell_batch.len();
@@ -1834,6 +1834,7 @@ impl ExInCounter {
         let mut failures = 0usize;
         let mut ok = 0usize;
         let mut skipped_bc = 0usize;
+        let n_molitems = molitems.len();
         for (bcumi, molitem) in molitems {
             let bc = bcumi.split('$').next().unwrap_or("");
             if let Some(&bcidx) = bc2idx.get(bc) {
@@ -1854,10 +1855,10 @@ impl ExInCounter {
             }
         }
         debug!("logic.count results: ok={ok} failures={failures} skipped_bc={skipped_bc}");
-        if !molitems.is_empty() && failures > molitems.len() / 4 {
+        if n_molitems > 0 && failures > n_molitems / 4 {
             warn!(
                 "More than 25% ({:.1}%) of molitems trashed",
-                100.0 * failures as f64 / molitems.len() as f64
+                100.0 * failures as f64 / n_molitems as f64
             );
         }
 
@@ -2747,9 +2748,15 @@ fn charge_compact_mapping(
     used: &mut usize,
     limit: usize,
 ) -> anyhow::Result<()> {
+    let transcript_count = mapping
+        .windows(2)
+        .filter(|pair| pair[0].feature.transcript_model_idx != pair[1].feature.transcript_model_idx)
+        .count()
+        .saturating_add(usize::from(!mapping.is_empty()));
     let bytes = mapping
         .capacity()
         .saturating_mul(std::mem::size_of::<CompactSegmentMatch>())
+        .saturating_add(transcript_count.saturating_mul(std::mem::size_of::<usize>()))
         .saturating_add(128);
     *used = used.saturating_add(bytes.saturating_mul(4));
     anyhow::ensure!(*used <= limit, "molecule evidence exceeds count budget; checkpoints retained; increase --count-memory-mb or reduce --cell-batch-size");

@@ -1,92 +1,99 @@
-use crate::{feature::Feature, molitem::Molitem, segment_match::SegmentMatch};
+use crate::{molitem::Molitem, segment_match::SegmentMatch};
 use std::collections::HashMap;
 
-#[derive(Clone)]
-pub(crate) struct CompactSegmentMatch {
-    pub(crate) transcript_idx: usize,
-    pub(crate) segment: (i64, i64),
-    pub(crate) feature_idx: usize,
-    pub(crate) is_spliced: bool,
-    pub(crate) feature: Feature,
-}
+pub(crate) type CompactSegmentMatch = SegmentMatch;
 
 #[derive(Default)]
 pub(crate) struct CompactMolitem {
     mappings: Option<Vec<CompactSegmentMatch>>,
+    transcript_indices: Vec<usize>,
 }
 
 impl CompactMolitem {
-    /// Intersect sorted transcript indices and append segment evidence for matches.
-    pub(crate) fn add_mapping(&mut self, mapping: Vec<CompactSegmentMatch>) {
+    /// Intersect sorted transcript indices and append evidence in read order.
+    pub(crate) fn add_mapping(&mut self, mut mapping: Vec<CompactSegmentMatch>) {
         debug_assert!(mapping
             .windows(2)
-            .all(|pair| pair[0].transcript_idx <= pair[1].transcript_idx));
-        let Some(existing) = self.mappings.take() else {
+            .all(|pair| transcript_idx(&pair[0]) <= transcript_idx(&pair[1])));
+        let mut incoming_indices = Vec::new();
+        for matched in &mapping {
+            let index = transcript_idx(matched);
+            if incoming_indices.last() != Some(&index) {
+                incoming_indices.push(index);
+            }
+        }
+        let Some(mut existing) = self.mappings.take() else {
+            self.transcript_indices = incoming_indices;
             self.mappings = Some(mapping);
             return;
         };
-        debug_assert!(existing
-            .windows(2)
-            .all(|pair| pair[0].transcript_idx <= pair[1].transcript_idx));
-        let mut existing = existing.into_iter();
-        let mut incoming = mapping.into_iter();
-        let mut old = existing.next();
-        let mut new = incoming.next();
-        let mut merged = Vec::new();
-        // The inputs are owned, so retained evidence moves without a per-molecule map rebuild.
-        while let (Some(old_match), Some(new_match)) = (old.as_ref(), new.as_ref()) {
-            let old_idx = old_match.transcript_idx;
-            let new_idx = new_match.transcript_idx;
-            match old_idx.cmp(&new_idx) {
-                std::cmp::Ordering::Less => {
-                    while old.as_ref().is_some_and(|m| m.transcript_idx == old_idx) {
-                        old = existing.next();
-                    }
-                }
-                std::cmp::Ordering::Greater => {
-                    while new.as_ref().is_some_and(|m| m.transcript_idx == new_idx) {
-                        new = incoming.next();
-                    }
-                }
+        let mut retained_indices = Vec::new();
+        let (mut old, mut new) = (0, 0);
+        while old < self.transcript_indices.len() && new < incoming_indices.len() {
+            match self.transcript_indices[old].cmp(&incoming_indices[new]) {
+                std::cmp::Ordering::Less => old += 1,
+                std::cmp::Ordering::Greater => new += 1,
                 std::cmp::Ordering::Equal => {
-                    while old.as_ref().is_some_and(|m| m.transcript_idx == old_idx) {
-                        merged.push(old.take().unwrap());
-                        old = existing.next();
-                    }
-                    while new.as_ref().is_some_and(|m| m.transcript_idx == new_idx) {
-                        merged.push(new.take().unwrap());
-                        new = incoming.next();
-                    }
+                    retained_indices.push(self.transcript_indices[old]);
+                    old += 1;
+                    new += 1;
                 }
             }
         }
-        self.mappings = Some(merged);
+        if retained_indices != self.transcript_indices {
+            existing.retain(|matched| {
+                retained_indices
+                    .binary_search(&transcript_idx(matched))
+                    .is_ok()
+            });
+        }
+        if retained_indices != incoming_indices {
+            mapping.retain(|matched| {
+                retained_indices
+                    .binary_search(&transcript_idx(matched))
+                    .is_ok()
+            });
+        }
+        existing.extend(mapping);
+        self.transcript_indices = retained_indices;
+        self.mappings = Some(existing);
     }
 
-    pub(crate) fn materialize(&self) -> Molitem {
-        let mappings_record = self.mappings.as_ref().map(|segments| {
-            let mut mappings = HashMap::new();
-            for segment in segments {
-                mappings
-                    .entry(segment.transcript_idx)
-                    .or_insert_with(Vec::new)
-                    .push(SegmentMatch {
-                        segment: segment.segment,
-                        feature_idx: segment.feature_idx,
-                        is_spliced: segment.is_spliced,
-                        feature: segment.feature.clone(),
-                    });
-            }
+    pub(crate) fn materialize(self) -> Molitem {
+        let Some(segments) = self.mappings else {
+            return Molitem {
+                mappings_record: None,
+            };
+        };
+        if self.transcript_indices.len() == 1 {
+            return Molitem {
+                mappings_record: Some(HashMap::from([(self.transcript_indices[0], segments)])),
+            };
+        }
+        let mut mappings = HashMap::new();
+        for segment in segments {
             mappings
-        });
-        Molitem { mappings_record }
+                .entry(transcript_idx(&segment))
+                .or_insert_with(Vec::new)
+                .push(segment);
+        }
+        Molitem {
+            mappings_record: Some(mappings),
+        }
     }
+}
+
+fn transcript_idx(matched: &CompactSegmentMatch) -> usize {
+    matched
+        .feature
+        .transcript_model_idx
+        .expect("compact evidence only contains transcript features")
 }
 
 #[cfg(test)]
 mod tests {
     use super::{CompactMolitem, CompactSegmentMatch};
-    use crate::feature::Feature;
+    use crate::{feature::Feature, segment_match::SegmentMatch};
     use std::collections::HashMap;
 
     fn segment(
@@ -94,12 +101,11 @@ mod tests {
         feature_idx: usize,
         coords: (i64, i64),
     ) -> CompactSegmentMatch {
-        CompactSegmentMatch {
-            transcript_idx,
-            segment: coords,
+        SegmentMatch::new(
+            coords,
             feature_idx,
-            is_spliced: feature_idx % 2 == 1,
-            feature: Feature {
+            feature_idx % 2 == 1,
+            Feature {
                 start: coords.0 - 2,
                 end: coords.1 + 2,
                 kind: if feature_idx % 2 == 0 { b'e' } else { b'i' },
@@ -107,7 +113,7 @@ mod tests {
                 is_validated: transcript_idx % 2 == 0,
                 transcript_model_idx: Some(transcript_idx),
             },
-        }
+        )
     }
 
     #[test]

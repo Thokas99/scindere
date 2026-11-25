@@ -211,14 +211,14 @@ impl FeatureIndex {
         let mut mapping_record: HashMap<usize, Vec<SegmentMatch>> = HashMap::new();
         for matched in self.find_overlapping_ivls_compact(read) {
             mapping_record
-                .entry(matched.transcript_idx)
+                .entry(
+                    matched
+                        .feature
+                        .transcript_model_idx
+                        .expect("overlap evidence has a transcript model"),
+                )
                 .or_default()
-                .push(SegmentMatch::new(
-                    matched.segment,
-                    matched.feature_idx,
-                    matched.is_spliced,
-                    matched.feature,
-                ));
+                .push(matched);
         }
         mapping_record
     }
@@ -242,14 +242,13 @@ impl FeatureIndex {
             while i < self.maxiidx && self.ivls[i].doesnt_start_after(*segment) {
                 let seg_len = segment.1 - segment.0;
                 if self.ivls[i].intersects(*segment, MIN_FLANK) && seg_len > MIN_FLANK {
-                    if let Some(tm_idx) = self.ivls[i].transcript_model_idx {
-                        mapping_record.push(CompactSegmentMatch {
-                            transcript_idx: tm_idx,
-                            segment: *segment,
-                            feature_idx: i,
-                            is_spliced: read.is_spliced(),
-                            feature: self.ivls[i].clone(),
-                        });
+                    if self.ivls[i].transcript_model_idx.is_some() {
+                        mapping_record.push(SegmentMatch::new(
+                            *segment,
+                            i,
+                            read.is_spliced(),
+                            self.ivls[i].clone(),
+                        ));
                     }
                 }
                 i += 1;
@@ -258,9 +257,11 @@ impl FeatureIndex {
 
         let mut transcript_stats = HashMap::new();
         for matched in &mapping_record {
-            let stats = transcript_stats
-                .entry(matched.transcript_idx)
-                .or_insert((0, true));
+            let transcript_idx = matched
+                .feature
+                .transcript_model_idx
+                .expect("overlap evidence has a transcript model");
+            let stats = transcript_stats.entry(transcript_idx).or_insert((0, true));
             stats.0 += 1;
             stats.1 &= SegmentMatch::skip_makes_sense_for(
                 matched.segment,
@@ -274,10 +275,19 @@ impl FeatureIndex {
             .max()
             .unwrap_or(0);
         mapping_record.retain(|matched| {
-            let (count, valid) = transcript_stats[&matched.transcript_idx];
+            let transcript_idx = matched
+                .feature
+                .transcript_model_idx
+                .expect("overlap evidence has a transcript model");
+            let (count, valid) = transcript_stats[&transcript_idx];
             count == max_n_segments && valid
         });
-        mapping_record.sort_by_key(|matched| matched.transcript_idx);
+        mapping_record.sort_by_key(|matched| {
+            matched
+                .feature
+                .transcript_model_idx
+                .expect("overlap evidence has a transcript model")
+        });
         mapping_record
     }
 }
@@ -379,7 +389,7 @@ mod tests {
         assert_eq!(public[&3].len(), 2);
         assert_eq!(compact.len(), 2);
         for (compact_match, public_match) in compact.iter().zip(&public[&3]) {
-            assert_eq!(compact_match.transcript_idx, 3);
+            assert_eq!(compact_match.feature.transcript_model_idx, Some(3));
             assert_eq!(compact_match.segment, public_match.segment);
             assert_eq!(compact_match.feature_idx, public_match.feature_idx);
             assert_eq!(compact_match.is_spliced, public_match.is_spliced);
